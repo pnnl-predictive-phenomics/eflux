@@ -38,7 +38,7 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold:floa
     return model, flux_bounds
 
 
-def get_gpr_dict(model: cobra.Model) -> dict:
+def get_gpr_dict(model: cobra.Model) -> dict[Reaction, list[list[Gene]]]:
     """Gene reaction rule (GPR) for each reaction in the model.
 
     inputs:
@@ -54,12 +54,12 @@ def get_gpr_dict(model: cobra.Model) -> dict:
             isozymes = set()
             for isozyme in [isozyme.strip('() ') for isozyme in r.gene_reaction_rule.split(' or ')]:
                 isozymes.add(frozenset(gene.strip('() ') for gene in isozyme.split(' and ')))
-            gpr_dict[r.id] = isozymes
+            gpr_dict[r] = isozymes
 
     return gpr_dict
 
 
-def gene_expression_to_enzyme_activity(model, gpr: dict[Reaction, list[list[Gene]]], expression: dict[Gene, float]):
+def gene_expression_to_enzyme_activity(model: cobra.Model, gpr: dict[Reaction, list[list[Gene]]], expression: dict[Gene, float]) -> dict[Reaction, float]:
     """Map gene expression to enzyme activity inputs.
 
     inputs:
@@ -98,7 +98,7 @@ def convert_transcriptomics_to_enzyme_activity(transcriptomics_data: pd.DataFram
     inputs:
         transcriptomics_data: dataframe of transcriptomics data
         model: cobra model
-        # gpr: dictionary of reactions (keys) to list of list of genes (values) for the correpsonding gene reaction rule
+        # gpr: dictionary of reaction ids (keys) to list of list of genes (values) for the correpsonding gene reaction rule
     outputs:
         enzyme_activity_df: dataframe of enzyme activity converted from transcriptomics data
     """
