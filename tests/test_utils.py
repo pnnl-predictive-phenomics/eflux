@@ -200,15 +200,12 @@ def test_empty_data_non_empty_model(transcriptomics, cobra_model_2):
 
 def test_non_empty_data_non_empty_model(transcriptomics, cobra_model_2):
     """Test convert_transcriptomics_to_enzyme_activity for non-empty data and non-empty model."""
-    r1 = cobra_model_2.reactions.get_by_id("r1")
-    r2 = cobra_model_2.reactions.get_by_id("r2")
-    r3 = cobra_model_2.reactions.get_by_id("r3")
-    r4 = cobra_model_2.reactions.get_by_id("r4")
     result = convert_transcriptomics_to_enzyme_activity(transcriptomics, cobra_model_2)
     expected_df = pd.DataFrame({'Reaction_ID': ['r1', 'r2', 'r3', 'r4'],
                                 'strain1': [np.nan, 1.0, np.inf, np.nan],
                                 'strain2': [np.nan, 4.0, np.inf, np.nan],
-                                }, index=[r1, r2, r3, r4])
-    assert result.shape == (4, 3)
+                                })
+    expected_df = expected_df.set_index('Reaction_ID')
+    assert result.shape == (4, 2)
     assert result.equals(expected_df)
 
