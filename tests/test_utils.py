@@ -2,9 +2,14 @@
 import numpy as np
 import pandas as pd
 import pytest
-from cobra.core import Metabolite, Reaction
+from cobra.core import Gene, Metabolite, Reaction
 from cobra.core.model import Model
-from eflux.utils import gene_expression_to_enzyme_activity, get_flux_bounds, get_gpr_dict
+from eflux.utils import (
+    convert_transcriptomics_to_enzyme_activity,
+    gene_expression_to_enzyme_activity,
+    get_flux_bounds,
+    get_gpr_dict,
+)
 
 
 @pytest.fixture(
@@ -58,6 +63,14 @@ def add_genes_to_r3(cobra_model_1):
 def expression():
     """Fixture for testing gene expression."""
     return {"gene1": 1.0, "gene2": 2.0, "gene3": 3.0, "gene4": 4.0, "gene5": 5.0, "gene6": 6.0, "gene7": 7.0, "gene8": 8.0}
+
+
+@pytest.fixture(
+        name="transcriptomics"
+)
+def transcriptomics_data():
+    """Fixture for testing transcriptomics data."""
+    return pd.DataFrame({'strain1': [1, 2, 3, 4, 5], 'strain2': [5, 4, 3, 2, 1]}, index=['gene1', 'gene2', 'gene3', 'gene5', 'gene6'])
 
 
 def test_get_flux_bounds(cobra_model):
@@ -153,4 +166,49 @@ def test_enzyme_activity_unobserved_gene(cobra_model_2, expression):
     gpr = get_gpr_dict(cobra_model_2)
     result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
     assert result[r4] == np.inf
+
+
+
+
+# @pytest.fixture
+# def model():
+#     model = Model()
+#     model.add_reaction(cobra.Reaction('rxn1'))
+#     model.add_reaction(cobra.Reaction('rxn2'))
+#     model.reactions['rxn1'].gene_reaction_rule = 'gene1 OR gene2'
+#     model.reactions['rxn2'].gene_reaction_rule = 'gene3 AND gene4'
+#     model.add_genes([cobra.Gene('gene1'), cobra.Gene('gene2'), cobra.Gene('gene3'), cobra.Gene('gene4')])
+#     return model
+
+def test_empty_data_empty_model(transcriptomics, cobra_model):
+    """Test convert_transcriptomics_to_enzyme_activity for empty data and empty model."""
+    result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), Model())
+    assert result.empty
+
+
+def test_non_empty_data_empty_model(transcriptomics, cobra_model):
+    """Test convert_transcriptomics_to_enzyme_activity for non-empty data and empty model."""
+    result = convert_transcriptomics_to_enzyme_activity(transcriptomics, Model())
+    assert result.empty
+
+
+def test_empty_data_non_empty_model(transcriptomics, cobra_model_2):
+    """Test convert_transcriptomics_to_enzyme_activity for empty data and non-empty model."""
+    result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), cobra_model_2)
+    assert result.empty
+
+
+def test_non_empty_data_non_empty_model(transcriptomics, cobra_model_2):
+    """Test convert_transcriptomics_to_enzyme_activity for non-empty data and non-empty model."""
+    r1 = cobra_model_2.reactions.get_by_id("r1")
+    r2 = cobra_model_2.reactions.get_by_id("r2")
+    r3 = cobra_model_2.reactions.get_by_id("r3")
+    r4 = cobra_model_2.reactions.get_by_id("r4")
+    result = convert_transcriptomics_to_enzyme_activity(transcriptomics, cobra_model_2)
+    expected_df = pd.DataFrame({'Reaction_ID': ['r1', 'r2', 'r3', 'r4'],
+                                'strain1': [np.nan, 1.0, np.inf, np.nan],
+                                'strain2': [np.nan, 4.0, np.inf, np.nan],
+                                }, index=[r1, r2, r3, r4])
+    assert result.shape == (4, 3)
+    assert result.equals(expected_df)
 
