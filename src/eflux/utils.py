@@ -1,20 +1,20 @@
-import sys
+"""Utils module for eflux package."""
+from typing import Tuple
 
 import cobra
-import gurobipy
 import numpy as np
 import pandas as pd
 from cobra import Gene, Reaction
-from eflux2 import EFlux2
 
 
-def get_flux_bounds(model, rxns_of_interest, zero_threshold=1e-9):
+def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold:float=1e-9) -> Tuple[cobra.Model, pd.DataFrame]:
     """Get flux bounds from FVA to use in surrogate model of reference strain.
 
-    The model is optimized to get fluxes for reactions of interest and runs FVA to get flux bounds adjusted by FVA for all other reactions.
+    The model is optimized to get flux bounds for all reactions by running FVA, except for those in rxn_list (fixed).
+    Note: FVA = flux variability analysis
     inputs:
         model: cobra model
-        rxns_of_interest: list of reactions of interest, corresponding to reference strain selection criteria
+        rxn_list: list of reactions of interest, corresponding to reference strain selection criteria
         zero_threshold: magnitude threshold to identify and replace numerically zero flux values
     outputs:
         flux_bounds: flux min and max values to be used as a representative bounds of the reference strain.
@@ -23,12 +23,12 @@ def get_flux_bounds(model, rxns_of_interest, zero_threshold=1e-9):
     opt_df = model.optimize().to_frame()
 
     # Set bounds for reactions of interest using optimized values
-    for rxn in rxns_of_interest:
+    for rxn in rxn_list:
        model.reactions.get_by_id(rxn).lower_bound = opt_df.loc[rxn, 'fluxes']
 
     # Run FVA to get (reasonably) tight bounds for all other reactions
-    keep_rxn_list = [r.id for r in model.reactions if (r.id not in rxns_of_interest)]
-    flux_bounds = cobra.flux_analysis.flux_variability_analysis(model=model, reaction_list=keep_rxn_list, 
+    keep_rxn_list = [r.id for r in model.reactions if (r.id not in rxn_list)]
+    flux_bounds = cobra.flux_analysis.flux_variability_analysis(model=model, reaction_list=keep_rxn_list,
                                                                fraction_of_optimum=0.85, processes=8)
     for c in flux_bounds.columns:
         for r in flux_bounds.index:
