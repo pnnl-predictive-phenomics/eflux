@@ -38,7 +38,7 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold:floa
     return model, flux_bounds
 
 
-def get_gpr_dict(model) -> dict:
+def get_gpr_dict(model: cobra.Model) -> dict:
     """Gene reaction rule (GPR) for each reaction in the model.
 
     inputs:
@@ -48,13 +48,13 @@ def get_gpr_dict(model) -> dict:
     """
     # Parse GPR into a dict containing isozymes (separated by 'or')
     # Each isozyme has a set of subunits (separated by 'and')
-    gpr_dict = dict()
+    gpr_dict = {}
     for r in model.reactions:
         if r.gene_reaction_rule:
             isozymes = set()
             for isozyme in [isozyme.strip('() ') for isozyme in r.gene_reaction_rule.split(' or ')]:
                 isozymes.add(frozenset(gene.strip('() ') for gene in isozyme.split(' and ')))
-            gpr_dict[r] = isozymes
+            gpr_dict[r.id] = isozymes
 
     return gpr_dict
 
