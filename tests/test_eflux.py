@@ -1,20 +1,15 @@
 import pytest
 from cobra import Model
-from eflux.eflux import add_slack_variables_to_model
-from fixtures import (
-    add_genes_to_r2,
-    add_genes_to_r3,
-    expression,
-    get_cobra_model,
-    transcriptomics_data,
-)
+from eflux.eflux2 import add_slack_variables_to_model
 
 
 @pytest.fixture
 def model():
+    """Create cobra model."""
     return Model()
 
-#TODO: Check these tests for relavance to eflux (Note: add_slack_variables_to_model is still under development)
+
+# TODO: Check these tests for relavance to eflux (Note: add_slack_variables_to_model is still under development)
 def test_add_slack_variables_to_model(model, upper_bounds):
     """Test add_slack_variables_to_model function."""
     # Test case 1: model and upper_bounds are valid inputs

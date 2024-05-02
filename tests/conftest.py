@@ -1,7 +1,8 @@
 """Fixtures for eflux tests."""
+
 import pandas as pd
 import pytest
-from cobra.core import Gene, Metabolite, Reaction
+from cobra.core import Metabolite, Reaction
 from cobra.core.model import Model
 
 
@@ -50,22 +51,31 @@ def add_genes_to_r3(cobra_model_1):
     return cobra_model_1
 
 
-@pytest.fixture(
-        name="expression"
-)
+@pytest.fixture(name="expression")
 def expression():
     """Fixture for testing gene expression."""
-    return {"gene1": 1.0, "gene2": 2.0, "gene3": 3.0, "gene4": 4.0, "gene5": 5.0, "gene6": 6.0, "gene7": 7.0, "gene8": 8.0}
+    return {
+        "gene1": 1.0,
+        "gene2": 2.0,
+        "gene3": 3.0,
+        "gene4": 4.0,
+        "gene5": 5.0,
+        "gene6": 6.0,
+        "gene7": 7.0,
+        "gene8": 8.0,
+    }
 
 
-@pytest.fixture(
-        name="transcriptomics"
-)
+@pytest.fixture(name="transcriptomics")
 def transcriptomics_data():
     """Fixture for testing transcriptomics data."""
-    return pd.DataFrame({'strain1': [1, 2, 3, 4, 5], 'strain2': [5, 4, 3, 2, 1]}, index=['gene1', 'gene2', 'gene3', 'gene5', 'gene6'])
+    return pd.DataFrame(
+        {"strain1": [1, 2, 3, 4, 5], "strain2": [5, 4, 3, 2, 1]},
+        index=["gene1", "gene2", "gene3", "gene5", "gene6"],
+    )
 
 
 @pytest.fixture
 def upper_bounds():
-    return {'reaction1': 10.0, 'reaction2': 5.0}
+    """Fixture to set upper bound on reaction."""
+    return {"reaction1": 10.0, "reaction2": 5.0}
