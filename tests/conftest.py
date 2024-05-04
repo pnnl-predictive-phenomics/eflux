@@ -79,3 +79,48 @@ def transcriptomics_data():
 def upper_bounds():
     """Fixture to set upper bound on reaction."""
     return {"reaction1": 10.0, "reaction2": 5.0}
+
+
+@pytest.fixture(
+        name="expected_fluxes",
+)
+def expected_fluxes():
+    """Fixture to set expected fluxes."""
+    return {'r1': 4.0, 'r2': 4.0, 'r3': 4.0, 'r4': 4.0}
+
+
+@pytest.fixture(
+        name="model_with_objective",
+)
+def model_with_objective(cobra_model):
+    """Fixture to set reaction r4 as objective."""
+    model = cobra_model.copy()
+    model.objective = model.reactions.get_by_id('r4')
+    return model
+
+
+@pytest.fixture(
+        name="min_uptake_model",
+)
+def min_uptake_model(model_with_objective):
+    """Fixture to set postive lower bound on reaction r1."""
+    model = model_with_objective.copy()
+    model.reactions.r1.lower_bound = 4.0
+    return model
+
+@pytest.fixture(
+        name="infeasible_upper_bounds",
+)
+def infeasible_upper_bounds():
+    """Fixture to set infeasible_upper_bounds."""
+    return {'r3': 3.0}
+
+@pytest.fixture(
+        name="infeasible_model",
+)
+def infeasible_model(min_uptake_model, infeasible_upper_bounds):
+    """Fixture to set infeasible model."""
+    model = min_uptake_model.copy()
+    for r, b in infeasible_upper_bounds.items():
+        model.reactions.get_by_id(r).upper_bound = b
+    return model

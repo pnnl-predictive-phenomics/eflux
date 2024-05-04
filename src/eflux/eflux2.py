@@ -4,7 +4,7 @@ import cobra
 import numpy as np
 import pandas as pd
 from optlang.symbolics import add
-from utils import get_gpr_dict
+from eflux.utils import get_gpr_dict
 
 
 def constrain_model_to_external_fluxes(
@@ -31,15 +31,48 @@ def constrain_model_to_external_fluxes(
     return model
 
 
-def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, float]) -> cobra.Model:
+def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000) -> cobra.Model:
     """Add slack variables to model.
 
     inputs:
-        model: cobra model
-        upper_bounds: dict (or dataframe column) of upper bounds for one strain/experimental condition
+        model: cobra model with objective already defined
+        upper_bounds: dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one 
+                      strain/experimental condition (e.g. scaled/normalized enzyme activity or external fluxes)
+        slack_weight: weight of slack variables relative to model.objective
     outputs:
         model: cobra model constrained using upper bounds, but relaxed using slack variables
     """
+    # Check for correct input types
+    if model is None:
+        raise TypeError("model cannot be None")
+    if upper_bounds is None:
+        raise TypeError("upper_bounds cannot be None")
+
+    # Copy model to prevent overwriting
+    relaxed_model = model.copy()
+
+    # Initialize list of slack variables
+    slack_vars = []
+
+    # Add slack variables
+    for r_id, bound in upper_bounds.items():
+        # Create slack variable for each reaction
+        this_rxn = relaxed_model.reactions.get_by_id(r_id)
+        this_slack_var = relaxed_model.problem.Variable('SLACK_' + r_id, lb=0)
+        slack_vars.append(this_slack_var)
+        # Add a constraint between the reaction flux and the slack variable using the upper bound
+        constraint = relaxed_model.problem.Constraint(this_rxn.flux_expression - this_slack_var, lb=0, ub=bound)
+        relaxed_model.add_cons_vars(constraint)
+
+    # Define a new combined objective
+    combined_objective = relaxed_model.problem.Objective(
+        relaxed_model.objective.expression - slack_weight * sum(slack_vars),
+        direction='max'
+    )
+
+    # Set the combined objective as the objective of the model
+    relaxed_model.objective = combined_objective
+
     return relaxed_model
 
 
@@ -73,35 +106,25 @@ def run_eflux(model: cobra.Model, tolerance: float = 1e-9) -> pd.DataFrame:
         # Use slack variables to overcome infeasibility
         slack_variables = {}
 
-    print("FBA status", fba_sol.status)
-    print("FBA solution", fba_sol.objective_value)
+    # print("FBA status", fba_sol.status)
+    # print("FBA solution", fba_sol.objective_value)
 
-    # Constrain the biomass to the optimal value
-    for r in constrained_model.reactions:
-        if r.objective_coefficient:
-            r.lower_bound = fba_sol.objective_value
+    # # Constrain the biomass to the optimal value
+    # for r in constrained_model.reactions:
+    #     if r.objective_coefficient:
+    #         r.lower_bound = fba_sol.objective_value
 
-    # minimize the sum of squared flux values
-    constrained_model.objective = constrained_model.problem.Objective(
-        add([r.flux_expression**2 for r in constrained_model.reactions]), direction="min"
-    )
-    eflux2_sol = constrained_model.optimize()
-    print("EFlux2 status", eflux2_sol.status)
-    print("EFlux2 solution", eflux2_sol.objective_value)
-    # return eflux2 solution
+    # # minimize the sum of squared flux values
+    # constrained_model.objective = constrained_model.problem.Objective(
+    #     add([r.flux_expression**2 for r in constrained_model.reactions]), direction="min"
+    # )
+    # eflux2_sol = constrained_model.optimize()
+    # print("EFlux2 status", eflux2_sol.status)
+    # print("EFlux2 solution", eflux2_sol.objective_value)
+    # # return eflux2 solution
+    # return eflux2_sol
+
     return eflux2_sol
-
-    return eflux2_sol
-
-
-# FIXME: This is the same method name as the one on L10? Does one need deleted or renamed?
-def constrain_model_to_external_fluxes(
-    model: cobra.Model, normalized_external_fluxes: dict[cobra.Reaction, float]
-) -> cobra.Model:
-    """Constrain model to external fluxes."""
-    for rxn in model.reactions:
-        if rxn.id in normalized_external_fluxes:
-            rxn.lower_bound = normalized_external_fluxes[rxn.id]
 
 
 def eflux2(
