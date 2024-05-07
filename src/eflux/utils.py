@@ -92,7 +92,7 @@ def gene_expression_to_enzyme_activity(model: cobra.Model, gpr: dict[Reaction, l
     return enzyme_activity
 
 
-def convert_transcriptomics_to_enzyme_activity(transcriptomics_data: pd.DataFrame, model):#gpr: dict[Reaction, list[list[Gene]]]):
+def convert_transcriptomics_to_enzyme_activity(transcriptomics_data: pd.DataFrame, model: cobra.Model) -> pd.DataFrame:
     """Convert transcriptomics data to enzyme activity.
 
     inputs:
@@ -126,4 +126,7 @@ def convert_transcriptomics_to_enzyme_activity(transcriptomics_data: pd.DataFram
         # Add enzymze_activity to dataframe
         enzyme_activity_df[this_strain] = enzyme_activity_dict
 
-    return enzyme_activity_df
+    if enzyme_activity_df.empty:
+        return pd.DataFrame()
+
+    return enzyme_activity_df.set_index('Reaction_ID')

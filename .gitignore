@@ -11,3 +11,9 @@ wheels/
 
 # emacs autosaves
 *~
+
+# ruff
+.ruff_cache
+
+# pytest
+.pytest_cache
