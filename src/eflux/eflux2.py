@@ -3,9 +3,6 @@
 import cobra
 import numpy as np
 import pandas as pd
-from optlang.symbolics import add
-
-from eflux.utils import get_gpr_dict
 
 
 def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000) -> cobra.Model:
@@ -51,3 +48,59 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     relaxed_model.objective = combined_objective
 
     return relaxed_model
+
+
+def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str) -> dict[str, float]:
+    """Create dictionary of normalized/relative scale factors for a target condition w.r.t. a reference condition.
+
+    inputs:
+        df: observed data with reaction ids as rownames, and column names of experimental conditions that include the reference and target
+        ref_col: column name for the reference condition
+        target_col: column name for the target condition
+    ouptut:
+        norm_cond_dict: a dictionary of reaction ids (keys) mapped to scaling factors (values)
+    """
+    # Check zero or inf or nan entries in ref_col
+    if np.any(df[ref_col] == 0) or np.any(np.isinf(df[ref_col])) or np.any(np.isnan(df[ref_col])):
+        raise ValueError("Reference condition contains zero or inf or nan entries")
+
+    # Check for inf or nan entries in target_col
+    if np.any(np.isinf(df[target_col])) or np.any(np.isnan(df[target_col])):
+        raise ValueError("Target condition contains inf or nan entries")
+
+    # Calculate relative scale factors
+    norm_cond_dict = df[target_col].divide(df[ref_col]).to_dict()
+
+    return norm_cond_dict
+
+
+def get_upper_bounds(model: cobra.Model, scaling_factors: dict) -> dict[str, float]:
+    """Get upper bounds.
+
+    inputs:
+        model: cobra model with reaction bounds adjusted by FVA
+        scaling_factors: dict of of reaction id (keys) and scaling_factors (values) obtained by
+                        normalizing observed data for one strain/experimental condition with 
+                        respect to a reference condition
+    outputs:
+        bounds_dict: dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
+    """
+    bounds_dict = {}
+    for rxn in model.reactions:
+        if rxn.id in scaling_factors:
+            bounds_dict[rxn.id] = rxn.upper_bound * scaling_factors[rxn.id]
+
+    return bounds_dict
+
+
+# Main function expected flow:
+# 1) inputs: cobra model, reference condition, observed external fluxes (can be metabolomics), observed enzyme activity (can be transcriptomics)
+# 2) run FVA
+# 3) Adjust cobra model bounds using FVA bounds
+# 4) Optional: convert metabolomics to external fluxes
+# 5) Optional: convert transcriptomics to enzyme activity
+# 6) Normalize external fluxes wrt reference condition
+# 7) Normalize enzyme activity fluxes wrt reference condition
+# 8) Get bounds for all reactions with corresponding observed data (from both enzyme activity and external fluxes)
+# 9) Run model constraints while using slack variables (add_slack_variables_to_model)
+# 10) Run FBA and output fluxes
