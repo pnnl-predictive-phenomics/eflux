@@ -66,21 +66,6 @@ def expression():
     }
 
 
-@pytest.fixture(name="transcriptomics")
-def transcriptomics_data():
-    """Fixture for testing transcriptomics data."""
-    return pd.DataFrame(
-        {"strain1": [1, 2, 3, 4, 5], "strain2": [5, 4, 3, 2, 1]},
-        index=["gene1", "gene2", "gene3", "gene5", "gene6"],
-    )
-
-
-@pytest.fixture
-def upper_bounds():
-    """Fixture to set upper bound on reaction."""
-    return {"reaction1": 10.0, "reaction2": 5.0}
-
-
 @pytest.fixture(
         name="expected_fluxes",
 )
@@ -108,12 +93,14 @@ def min_uptake_model(model_with_objective):
     model.reactions.r1.lower_bound = 4.0
     return model
 
+
 @pytest.fixture(
         name="infeasible_upper_bounds",
 )
 def infeasible_upper_bounds():
     """Fixture to set infeasible_upper_bounds."""
     return {'r3': 3.0}
+
 
 @pytest.fixture(
         name="infeasible_model",
@@ -124,3 +111,19 @@ def infeasible_model(min_uptake_model, infeasible_upper_bounds):
     for r, b in infeasible_upper_bounds.items():
         model.reactions.get_by_id(r).upper_bound = b
     return model
+
+
+@pytest.fixture(
+        name="input_enzyme_activity",
+)
+def input_enzyme_activity():
+    """Fixture enzyme activity input."""
+    return {'r1': 0.75, 'r2': 1.25, 'r3': 0.1, 'r4': 1.1}
+
+
+@pytest.fixture(
+        name="expected_dict_from_get_enzyme_bounds",
+)
+def expected_dict_from_get_enzyme_bounds():
+    """Fixture for expected bounds from enzyme activity for output comparison."""
+    return {'r1': 4.0, 'r2': 4.0, 'r3': 4.0, 'r4': 4.0}

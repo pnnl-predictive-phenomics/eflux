@@ -51,3 +51,41 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     relaxed_model.objective = combined_objective
 
     return relaxed_model
+
+
+def get_enzyme_bounds(model: cobra.Model, norm_enzyme_activity: dict) -> dict[str, float]:
+    """Get enzyme bounds.
+
+    inputs:
+        model: cobra model with reaction bounds adjusted by FVA
+        norm_enzyme_activity: dict (or dataframe column) of enzyme activity for one strain/experimental condition normalized with respect to reference strain
+    outputs:
+        enzyme_bounds: dict of reaction id keys and upper bound values for fluxes corresponding to one strain/experimental condition
+    """
+    bounds_dict = {}
+
+
+
+    return {}
+
+
+def get_normalized_condition(df:pd.DataFrame, ref_col: str, taget_col: str) -> dict[str, float]:
+    """"""
+    # Check zero or inf entries in ref_col
+
+    # Check for inf entries in target_col
+
+    return df[taget_col].divide(df[ref_col]).to_dict()
+
+
+# Main function expected flow:
+# 1) inputs: cobra model, reference condition, observed external fluxes (can be metabolomics), observed enzyme activity (can be transcriptomics)
+# 2) run FVA
+# 3) Adjust cobra model bounds using FVA bounds
+# 4) Optional: convert metabolomics to external fluxes
+# 5) Optional: convert transcriptomics to enzyme activity
+# 6) Normalize external fluxes wrt reference condition
+# 7) Normalize enzyme activity fluxes wrt reference condition
+# 8) Get bounds for all reactions with corresponding observed data (from both enzyme activity and external fluxes)
+# 9) Run model constraints while using slack variables (add_slack_variables_to_model)
+# 10) Run FBA and output fluxes

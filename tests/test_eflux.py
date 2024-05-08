@@ -1,9 +1,8 @@
 import pytest
 from cobra import Model, exceptions
-from eflux.eflux2 import add_slack_variables_to_model
+from eflux.eflux2 import add_slack_variables_to_model, get_enzyme_bounds
 
 
-# TODO: Check these tests for relavance to eflux (Note: add_slack_variables_to_model is still under development)
 def test_add_slack_variables_to_model(min_uptake_model, infeasible_upper_bounds, expected_fluxes):
     """Test add_slack_variables_to_model function."""
     # Test case 1: model is None
@@ -31,3 +30,22 @@ def test_infeasible_model(infeasible_model):
     """Test infeasible_model function."""
     with pytest.raises(exceptions.OptimizationError):
         infeasible_model.optimize(raise_error=True)
+
+
+def test_empty_model_input(input_enzyme_activity):
+    """Test get_enzyme_bounds with empty model input."""
+    enzyme_bounds = get_enzyme_bounds(model={}, norm_enzyme_activity=input_enzyme_activity)
+    assert enzyme_bounds == {}
+
+
+def test_empty_norm_enzyme_activity_input(cobra_model):
+    """Test get_enzyme_bounds with empty norm_enzyme_activity input."""
+    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity={})
+    assert enzyme_bounds == {}
+
+
+def test_valid_inputs(cobra_model, input_enzyme_activity, expected_dict_from_get_enzyme_bounds):
+    """Test get_enzyme_bounds with valid inputs."""
+    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity=input_enzyme_activity)
+    assert isinstance(enzyme_bounds, dict)  # is this needed?
+    assert enzyme_bounds == expected_dict_from_get_enzyme_bounds
