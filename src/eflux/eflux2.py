@@ -64,18 +64,35 @@ def get_enzyme_bounds(model: cobra.Model, norm_enzyme_activity: dict) -> dict[st
     """
     bounds_dict = {}
 
-
-
     return {}
 
 
-def get_normalized_condition(df:pd.DataFrame, ref_col: str, taget_col: str) -> dict[str, float]:
-    """"""
-    # Check zero or inf entries in ref_col
+def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str) -> dict[str, float]:
+    """Create dictionary of normalized/relative scale factors for a target condition w.r.t. a reference condition.
 
-    # Check for inf entries in target_col
+    inputs:
+        df: observed data with reaction ids as rownames, and column names of experimental conditions that include the reference and target
+        ref_col: column name for the reference condition
+        target_col: column name for the target condition
+    ouptut:
+        norm_cond_dict: a dictionary of reaction ids (keys) mapped to scaling factors (values)
+    """
+    # Check zero or inf or nan entries in ref_col
+    if np.any(df[ref_col] == 0) or np.any(np.isinf(df[ref_col])) or np.any(np.isnan(df[ref_col])):
+        raise ValueError("Reference condition contains zero or inf or nan entries")
 
-    return df[taget_col].divide(df[ref_col]).to_dict()
+    # Check for inf or nan entries in target_col
+    if np.any(np.isinf(df[target_col])) or np.any(np.isnan(df[target_col])):
+        raise ValueError("Target condition contains inf or nan entries")
+
+    # Calculate relative scale factors
+    norm_cond_dict = df[target_col].divide(df[ref_col]).to_dict()
+
+    # # Check for inf or nan entries in norm_cond_dict
+    # if np.any(np.isinf(list(norm_cond_dict.values())) or np.isnan(list(norm_cond_dict.values()))):
+    #     raise ValueError("Normalized condition contains inf entries")
+
+    return norm_cond_dict
 
 
 # Main function expected flow:

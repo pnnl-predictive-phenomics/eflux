@@ -1,5 +1,6 @@
 """Fixtures for eflux tests."""
 
+import numpy as np
 import pandas as pd
 import pytest
 from cobra.core import Metabolite, Reaction
@@ -118,6 +119,37 @@ def infeasible_model(min_uptake_model, infeasible_upper_bounds):
 )
 def input_enzyme_activity():
     """Fixture enzyme activity input."""
+    return pd.DataFrame({'reference_cond': [1.0, 2.0, 3.0, 4.0],
+                         'target_cond': [2.0, 4.0, 6.0, 8.0],
+                         'ref_col_with_zero': [0.0, 2.0, 3.0, 4.0],
+                         'ref_col_with_inf': [1.0, np.inf, 3.0, 4.0],
+                         'ref_col_with_nan': [1.0, 2.0, np.nan, 4.0],
+                         'target_col_with_inf': [np.inf, 4.0, 6.0, 8.0],
+                         'target_col_with_nan': [1.0, 2.0, np.nan, 4.0]},
+                         index=['r1', 'r2', 'r3', 'r4'])
+
+
+@pytest.fixture(
+        name="good_ref_col",
+)
+def good_ref_col():
+    """Fixture for good reference column."""
+    return 'reference_cond'
+
+
+@pytest.fixture(
+        name="good_target_col",
+)
+def good_target_col():
+    """Fixture for good target column."""
+    return 'target_cond'
+
+
+@pytest.fixture(
+        name="input_normalized_enzyme_activity",
+)
+def input_normalized_enzyme_activity():
+    """Fixture normalized enzyme activity input."""
     return {'r1': 0.75, 'r2': 1.25, 'r3': 0.1, 'r4': 1.1}
 
 

@@ -1,6 +1,8 @@
 import pytest
+import numpy as np
+import pandas as pd
 from cobra import Model, exceptions
-from eflux.eflux2 import add_slack_variables_to_model, get_enzyme_bounds
+from eflux.eflux2 import add_slack_variables_to_model, get_enzyme_bounds, get_normalized_condition
 
 
 def test_add_slack_variables_to_model(min_uptake_model, infeasible_upper_bounds, expected_fluxes):
@@ -32,20 +34,48 @@ def test_infeasible_model(infeasible_model):
         infeasible_model.optimize(raise_error=True)
 
 
-def test_empty_model_input(input_enzyme_activity):
-    """Test get_enzyme_bounds with empty model input."""
-    enzyme_bounds = get_enzyme_bounds(model={}, norm_enzyme_activity=input_enzyme_activity)
+def test_get_enzyme_bounds(cobra_model, input_normalized_enzyme_activity, expected_dict_from_get_enzyme_bounds):
+    """Test get_enzyme_bounds function."""
+    # Test get_enzyme_bounds with empty model input.
+    enzyme_bounds = get_enzyme_bounds(model=None, norm_enzyme_activity=input_normalized_enzyme_activity)
     assert enzyme_bounds == {}
 
-
-def test_empty_norm_enzyme_activity_input(cobra_model):
-    """Test get_enzyme_bounds with empty norm_enzyme_activity input."""
+    # Test get_enzyme_bounds with empty norm_enzyme_activity input.
     enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity={})
     assert enzyme_bounds == {}
 
-
-def test_valid_inputs(cobra_model, input_enzyme_activity, expected_dict_from_get_enzyme_bounds):
-    """Test get_enzyme_bounds with valid inputs."""
-    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity=input_enzyme_activity)
+    # Test get_enzyme_bounds with valid inputs.
+    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity=input_normalized_enzyme_activity)
     assert isinstance(enzyme_bounds, dict)  # is this needed?
     assert enzyme_bounds == expected_dict_from_get_enzyme_bounds
+
+
+def test_get_normalized_condition(input_enzyme_activity, good_ref_col, good_target_col):
+    """Test get_normalized_condition function."""
+    # Test get_normalized_condition with bad reference and target column names.
+    with pytest.raises(KeyError):
+        get_normalized_condition(df=input_enzyme_activity, ref_col='bad_ref_col', target_col='bad_target_col')
+    with pytest.raises(KeyError):
+        get_normalized_condition(input_enzyme_activity, ref_col=good_ref_col, target_col='bad_target_col')
+    with pytest.raises(KeyError):
+        get_normalized_condition(input_enzyme_activity, ref_col='bad_ref_col', target_col=good_target_col)
+
+    # Test get_normalized_condition with zero entries in ref_col
+    with pytest.raises(ValueError):
+        get_normalized_condition(input_enzyme_activity, ref_col='ref_col_with_zero', target_col=good_target_col)
+
+    # Test get_normalized_condition with inf or nan entries in ref_col."""
+    with pytest.raises(ValueError):
+        get_normalized_condition(input_enzyme_activity, ref_col='ref_col_with_inf', target_col=good_target_col)
+    with pytest.raises(ValueError):
+        get_normalized_condition(input_enzyme_activity, ref_col='ref_col_with_nan', target_col=good_target_col)
+
+    # Test get_normalized_condition with inf or nan entries in target_col.
+    with pytest.raises(ValueError):
+        get_normalized_condition(input_enzyme_activity, ref_col=good_ref_col, target_col='target_col_with_inf')
+    with pytest.raises(ValueError):
+        get_normalized_condition(input_enzyme_activity, ref_col=good_ref_col, target_col='target_col_with_nan')
+
+    # Test get_normalized_condition with normal case.
+    result = get_normalized_condition(input_enzyme_activity, ref_col=good_ref_col, target_col=good_target_col)
+    assert result == {'r1': 2.0, 'r2': 2.0, 'r3': 2.0, 'r4': 2.0}
