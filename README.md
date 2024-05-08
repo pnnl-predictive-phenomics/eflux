@@ -24,7 +24,7 @@ pip install git+https://github.com/pnnl-predictive-phenomics/eflux.git
 
 ## License
 
-The code in this package is licensed under the GPLv2 License.
+The code in this package is licensed under the BSD-2 License.
 
 
 ## Development
