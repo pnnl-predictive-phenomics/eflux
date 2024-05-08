@@ -24,7 +24,7 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: flo
 
     # Set bounds for reactions of interest using optimized values
     for rxn in rxn_list:
-       model.reactions.get_by_id(rxn).lower_bound = opt_df.loc[rxn, 'fluxes']
+        model.reactions.get_by_id(rxn).lower_bound = opt_df.loc[rxn, 'fluxes']
 
     # Run FVA to get (reasonably) tight bounds for all other reactions
     keep_rxn_list = [r.id for r in model.reactions if (r.id not in rxn_list)]
