@@ -1,8 +1,8 @@
+"""Tests for eflux functions."""
+
 import pytest
-import numpy as np
-import pandas as pd
-from cobra import Model, exceptions
-from eflux.eflux2 import add_slack_variables_to_model, get_enzyme_bounds, get_normalized_condition
+from cobra import exceptions
+from eflux.eflux2 import add_slack_variables_to_model, get_normalized_condition, get_upper_bounds
 
 
 def test_add_slack_variables_to_model(min_uptake_model, infeasible_upper_bounds, expected_fluxes):
@@ -34,22 +34,6 @@ def test_infeasible_model(infeasible_model):
         infeasible_model.optimize(raise_error=True)
 
 
-def test_get_enzyme_bounds(cobra_model, input_normalized_enzyme_activity, expected_dict_from_get_enzyme_bounds):
-    """Test get_enzyme_bounds function."""
-    # Test get_enzyme_bounds with empty model input.
-    enzyme_bounds = get_enzyme_bounds(model=None, norm_enzyme_activity=input_normalized_enzyme_activity)
-    assert enzyme_bounds == {}
-
-    # Test get_enzyme_bounds with empty norm_enzyme_activity input.
-    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity={})
-    assert enzyme_bounds == {}
-
-    # Test get_enzyme_bounds with valid inputs.
-    enzyme_bounds = get_enzyme_bounds(model=cobra_model, norm_enzyme_activity=input_normalized_enzyme_activity)
-    assert isinstance(enzyme_bounds, dict)  # is this needed?
-    assert enzyme_bounds == expected_dict_from_get_enzyme_bounds
-
-
 def test_get_normalized_condition(input_enzyme_activity, good_ref_col, good_target_col):
     """Test get_normalized_condition function."""
     # Test get_normalized_condition with bad reference and target column names.
@@ -79,3 +63,19 @@ def test_get_normalized_condition(input_enzyme_activity, good_ref_col, good_targ
     # Test get_normalized_condition with normal case.
     result = get_normalized_condition(input_enzyme_activity, ref_col=good_ref_col, target_col=good_target_col)
     assert result == {'r1': 2.0, 'r2': 2.0, 'r3': 2.0, 'r4': 2.0}
+
+
+def test_get_upper_bounds(cobra_model, input_normalized_enzyme_activity, expected_dict_from_get_enzyme_bounds):
+    """Test get_upper_bounds function."""
+    # Test get_upper_bounds with empty model input.
+    with pytest.raises(AttributeError):
+        get_upper_bounds(model=None, scaling_factors=input_normalized_enzyme_activity)
+
+    # Test get_upper_bounds with empty norm_enzyme_activity input.
+    enzyme_bounds = get_upper_bounds(model=cobra_model, scaling_factors={})
+    assert enzyme_bounds == {}
+
+    # Test get_upper_bounds with valid inputs.
+    enzyme_bounds = get_upper_bounds(model=cobra_model, scaling_factors=input_normalized_enzyme_activity)
+    assert isinstance(enzyme_bounds, dict)  # is this needed?
+    assert enzyme_bounds == expected_dict_from_get_enzyme_bounds

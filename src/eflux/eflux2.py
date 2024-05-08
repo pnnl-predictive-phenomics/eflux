@@ -3,9 +3,6 @@
 import cobra
 import numpy as np
 import pandas as pd
-from optlang.symbolics import add
-
-from eflux.utils import get_gpr_dict
 
 
 def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000) -> cobra.Model:
@@ -53,20 +50,6 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     return relaxed_model
 
 
-def get_enzyme_bounds(model: cobra.Model, norm_enzyme_activity: dict) -> dict[str, float]:
-    """Get enzyme bounds.
-
-    inputs:
-        model: cobra model with reaction bounds adjusted by FVA
-        norm_enzyme_activity: dict (or dataframe column) of enzyme activity for one strain/experimental condition normalized with respect to reference strain
-    outputs:
-        enzyme_bounds: dict of reaction id keys and upper bound values for fluxes corresponding to one strain/experimental condition
-    """
-    bounds_dict = {}
-
-    return {}
-
-
 def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str) -> dict[str, float]:
     """Create dictionary of normalized/relative scale factors for a target condition w.r.t. a reference condition.
 
@@ -88,11 +71,26 @@ def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str)
     # Calculate relative scale factors
     norm_cond_dict = df[target_col].divide(df[ref_col]).to_dict()
 
-    # # Check for inf or nan entries in norm_cond_dict
-    # if np.any(np.isinf(list(norm_cond_dict.values())) or np.isnan(list(norm_cond_dict.values()))):
-    #     raise ValueError("Normalized condition contains inf entries")
-
     return norm_cond_dict
+
+
+def get_upper_bounds(model: cobra.Model, scaling_factors: dict) -> dict[str, float]:
+    """Get upper bounds.
+
+    inputs:
+        model: cobra model with reaction bounds adjusted by FVA
+        scaling_factors: dict of of reaction id (keys) and scaling_factors (values) obtained by
+                        normalizing observed data for one strain/experimental condition with 
+                        respect to a reference condition
+    outputs:
+        bounds_dict: dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
+    """
+    bounds_dict = {}
+    for rxn in model.reactions:
+        if rxn.id in scaling_factors:
+            bounds_dict[rxn.id] = rxn.upper_bound * scaling_factors[rxn.id]
+
+    return bounds_dict
 
 
 # Main function expected flow:

@@ -7,7 +7,7 @@ import pandas as pd
 from cobra import Gene, Reaction
 
 
-def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold:float=1e-9) -> Tuple[cobra.Model, pd.DataFrame]:
+def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: float = 1e-9) -> Tuple[cobra.Model, pd.DataFrame]:
     """Get flux bounds from FVA to use in surrogate model of reference strain.
 
     The model is optimized to get flux bounds for all reactions by running FVA, except for those in rxn_list (fixed).
@@ -32,7 +32,7 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold:floa
                                                                fraction_of_optimum=0.85, processes=8)
     for c in flux_bounds.columns:
         for r in flux_bounds.index:
-            if (flux_bounds[c][r] > -1*zero_threshold) and (flux_bounds[c][r] < zero_threshold):
+            if (flux_bounds[c][r] > -1 * zero_threshold) and (flux_bounds[c][r] < zero_threshold):
                 flux_bounds[c][r] = 0
 
     return model, flux_bounds
@@ -76,7 +76,7 @@ def gene_expression_to_enzyme_activity(model: cobra.Model, gpr: dict[Reaction, l
         # Obvious example: Exchange/transport reactions don't have corresponding genes in their reaction rule, so that will take a NaN-value
         enzyme_activity[rxn] = 0.0
 
-        if rxn in gpr: # ensure rxn has a gene_reaction_rule defined
+        if rxn in gpr:  # ensure rxn has a gene_reaction_rule defined
             for isozyme in gpr[rxn]:
                 # Initialize isozyme_activity for this isozyme to infinity
                 # Note: infinity-value is preserved IF this isozyme is not present in the observed transcriptomics data

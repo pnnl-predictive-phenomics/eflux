@@ -158,4 +158,4 @@ def input_normalized_enzyme_activity():
 )
 def expected_dict_from_get_enzyme_bounds():
     """Fixture for expected bounds from enzyme activity for output comparison."""
-    return {'r1': 4.0, 'r2': 4.0, 'r3': 4.0, 'r4': 4.0}
+    return {'r1': 750.0, 'r2': 12.5, 'r3': 0.5, 'r4': 1100.0}
