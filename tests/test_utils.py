@@ -123,27 +123,27 @@ def test_enzyme_activity_unobserved_gene(cobra_model_2, expression):
 #     return model
 
 
-def test_empty_data_empty_model(transcriptomics, cobra_model):
+def test_empty_data_empty_model(input_transcriptomics, cobra_model):
     """Test convert_transcriptomics_to_enzyme_activity for empty data and empty model."""
     result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), Model())
     assert result.empty
 
 
-def test_non_empty_data_empty_model(transcriptomics, cobra_model):
+def test_non_empty_data_empty_model(input_transcriptomics, cobra_model):
     """Test convert_transcriptomics_to_enzyme_activity for non-empty data and empty model."""
-    result = convert_transcriptomics_to_enzyme_activity(transcriptomics, Model())
+    result = convert_transcriptomics_to_enzyme_activity(input_transcriptomics, Model())
     assert result.empty
 
 
-def test_empty_data_non_empty_model(transcriptomics, cobra_model_2):
+def test_empty_data_non_empty_model(input_transcriptomics, cobra_model_2):
     """Test convert_transcriptomics_to_enzyme_activity for empty data and non-empty model."""
     result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), cobra_model_2)
     assert result.empty
 
 
-def test_non_empty_data_non_empty_model(transcriptomics, cobra_model_2):
+def test_non_empty_data_non_empty_model(input_transcriptomics, cobra_model_2):
     """Test convert_transcriptomics_to_enzyme_activity for non-empty data and non-empty model."""
-    result = convert_transcriptomics_to_enzyme_activity(transcriptomics, cobra_model_2)
+    result = convert_transcriptomics_to_enzyme_activity(input_transcriptomics, cobra_model_2)
     expected_df = pd.DataFrame(
         {
             "Reaction_ID": ["r1", "r2", "r3", "r4"],

@@ -1,5 +1,6 @@
 """Fixtures for eflux tests."""
 
+import numpy as np
 import pandas as pd
 import pytest
 from cobra.core import Metabolite, Reaction
@@ -62,23 +63,17 @@ def expression():
         "gene5": 5.0,
         "gene6": 6.0,
         "gene7": 7.0,
-        "gene8": 8.0,
+        "gene8": 8.0
     }
 
 
-@pytest.fixture(name="transcriptomics")
-def transcriptomics_data():
+@pytest.fixture(name="input_transcriptomics")
+def input_transcriptomics():
     """Fixture for testing transcriptomics data."""
     return pd.DataFrame(
         {"strain1": [1, 2, 3, 4, 5], "strain2": [5, 4, 3, 2, 1]},
         index=["gene1", "gene2", "gene3", "gene5", "gene6"],
     )
-
-
-@pytest.fixture
-def upper_bounds():
-    """Fixture to set upper bound on reaction."""
-    return {"reaction1": 10.0, "reaction2": 5.0}
 
 
 @pytest.fixture(
@@ -108,12 +103,14 @@ def min_uptake_model(model_with_objective):
     model.reactions.r1.lower_bound = 4.0
     return model
 
+
 @pytest.fixture(
         name="infeasible_upper_bounds",
 )
 def infeasible_upper_bounds():
     """Fixture to set infeasible_upper_bounds."""
     return {'r3': 3.0}
+
 
 @pytest.fixture(
         name="infeasible_model",
@@ -124,3 +121,50 @@ def infeasible_model(min_uptake_model, infeasible_upper_bounds):
     for r, b in infeasible_upper_bounds.items():
         model.reactions.get_by_id(r).upper_bound = b
     return model
+
+
+@pytest.fixture(
+        name="input_enzyme_activity",
+)
+def input_enzyme_activity():
+    """Fixture enzyme activity input."""
+    return pd.DataFrame({'reference_cond': [1.0, 2.0, 3.0, 4.0],
+                         'target_cond': [2.0, 4.0, 6.0, 8.0],
+                         'ref_col_with_zero': [0.0, 2.0, 3.0, 4.0],
+                         'ref_col_with_inf': [1.0, np.inf, 3.0, 4.0],
+                         'ref_col_with_nan': [1.0, 2.0, np.nan, 4.0],
+                         'target_col_with_inf': [np.inf, 4.0, 6.0, 8.0],
+                         'target_col_with_nan': [1.0, 2.0, np.nan, 4.0]},
+                         index=['r1', 'r2', 'r3', 'r4'])
+
+
+@pytest.fixture(
+        name="good_ref_col",
+)
+def good_ref_col():
+    """Fixture for good reference column."""
+    return 'reference_cond'
+
+
+@pytest.fixture(
+        name="good_target_col",
+)
+def good_target_col():
+    """Fixture for good target column."""
+    return 'target_cond'
+
+
+@pytest.fixture(
+        name="input_normalized_enzyme_activity",
+)
+def input_normalized_enzyme_activity():
+    """Fixture normalized enzyme activity input."""
+    return {'r1': 0.75, 'r2': 1.25, 'r3': 0.1, 'r4': 1.1}
+
+
+@pytest.fixture(
+        name="expected_dict_from_get_enzyme_bounds",
+)
+def expected_dict_from_get_enzyme_bounds():
+    """Fixture for expected bounds from enzyme activity for output comparison."""
+    return {'r1': 750.0, 'r2': 12.5, 'r3': 0.5, 'r4': 1100.0}
