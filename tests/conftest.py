@@ -63,8 +63,17 @@ def expression():
         "gene5": 5.0,
         "gene6": 6.0,
         "gene7": 7.0,
-        "gene8": 8.0,
+        "gene8": 8.0
     }
+
+
+@pytest.fixture(name="input_transcriptomics")
+def input_transcriptomics():
+    """Fixture for testing transcriptomics data."""
+    return pd.DataFrame(
+        {"strain1": [1, 2, 3, 4, 5], "strain2": [5, 4, 3, 2, 1]},
+        index=["gene1", "gene2", "gene3", "gene5", "gene6"],
+    )
 
 
 @pytest.fixture(
