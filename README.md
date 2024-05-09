@@ -32,4 +32,4 @@ The code in this package is licensed under the BSD-2 License.
 
 
 ## Contributing 👋
-To contribute to this package, please reference [CONTRIBUTING.md](pnnl-predictive-phenomics/eflux/CONTRIBUTING.md)
+To contribute to this package, please reference [CONTRIBUTING.md](CONTRIBUTING.md)
