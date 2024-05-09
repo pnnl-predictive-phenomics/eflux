@@ -10,7 +10,7 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
 
     inputs:
         model: cobra model with objective already defined
-        upper_bounds: dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one 
+        upper_bounds: dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one
                       strain/experimental condition (e.g. scaled/normalized enzyme activity or external fluxes)
         slack_weight: weight of slack variables relative to model.objective
     outputs:
@@ -80,7 +80,7 @@ def get_upper_bounds(model: cobra.Model, scaling_factors: dict) -> dict[str, flo
     inputs:
         model: cobra model with reaction bounds adjusted by FVA
         scaling_factors: dict of of reaction id (keys) and scaling_factors (values) obtained by
-                        normalizing observed data for one strain/experimental condition with 
+                        normalizing observed data for one strain/experimental condition with
                         respect to a reference condition
     outputs:
         bounds_dict: dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
