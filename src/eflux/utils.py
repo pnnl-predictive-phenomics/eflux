@@ -7,7 +7,7 @@ import pandas as pd
 from cobra import Gene, Reaction
 
 
-def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: float = 1e-9) -> Tuple[cobra.Model, pd.DataFrame]:
+def get_max_flux_bounds(model: cobra.Model, rxn_list: list[str], precision: int = 9) -> Tuple[cobra.Model, pd.DataFrame]:
     """Get flux bounds from FVA to use in surrogate model of reference strain.
 
     Note: FVA = flux variability analysis
@@ -16,19 +16,15 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: flo
         rxn_list: list of reactions of interest, corresponding to reference strain selection criteria
         zero_threshold: magnitude threshold to identify and replace numerically zero flux values
     outputs:
-        flux_bounds: flux min and max values to be used as a representative bounds of the reference strain.
+        max_flux_bounds: max flux values to be used as a representative bounds of the reference strain.
     """
     # Run FVA to get (reasonably) tight bounds for all other reactions
     keep_rxn_list = [r.id for r in model.reactions if (r.id not in rxn_list)]
     flux_bounds = cobra.flux_analysis.flux_variability_analysis(model=model, reaction_list=keep_rxn_list,
                                                                fraction_of_optimum=0.85, processes=8)
-    # Round values smaller than zero_threshold to zero
-    for c in flux_bounds.columns:
-        for r in flux_bounds.index:
-            if (abs(flux_bounds[c][r]) <= abs(zero_threshold)):
-                flux_bounds[c][r] = 0
+    max_flux_bounds = flux_bounds["maximum"].round(decimals=precision).to_dict()
 
-    return flux_bounds
+    return max_flux_bounds
 
 
 def get_gpr_dict(model: cobra.Model) -> dict[Reaction, list[list[Gene]]]:

@@ -6,31 +6,27 @@ from cobra.core.model import Model
 from eflux.utils import (
     convert_transcriptomics_to_enzyme_activity,
     gene_expression_to_enzyme_activity,
-    get_flux_bounds,
     get_gpr_dict,
+    get_max_flux_bounds,
 )
 
 
-def test_get_flux_bounds(cobra_model):
+def test_get_max_flux_bounds(cobra_model):
     """Test flux bounds for r1 and r2."""
-    flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"])
+    flux_bounds = get_max_flux_bounds(cobra_model, ["r1", "r4"])
 
-    assert flux_bounds.loc["r2", "minimum"] == 0.01
-    assert flux_bounds.loc["r2", "maximum"] == 5
-    assert flux_bounds.loc["r3", "minimum"] == 0.01
-    assert flux_bounds.loc["r3", "maximum"] == 5
+    assert flux_bounds["r2"] == 5
+    assert flux_bounds["r3"] == 5
 
 
-def test_get_flux_bounds_with_zero_threshold(cobra_model):
+def test_get_max_flux_bounds_with_zero_threshold(cobra_model):
     """Test flux bounds for r1 and r2 with a zero threshold defined."""
     # Get flux bounds for r1 and r2 with a zero threshold
-    flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"], zero_threshold=0.1)
+    flux_bounds = get_max_flux_bounds(cobra_model, ["r1", "r4"], precision=1)
 
     # Check that flux bounds are set correctly
-    assert flux_bounds.loc["r2", "minimum"] == 0
-    assert flux_bounds.loc["r2", "maximum"] == 5
-    assert flux_bounds.loc["r3", "minimum"] == 0
-    assert flux_bounds.loc["r3", "maximum"] == 5
+    assert flux_bounds["r2"] == 5
+    assert flux_bounds["r3"] == 5
 
     # Check that flux bounds are set correctly when zero_threshold is set to 0
 
