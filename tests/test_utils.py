@@ -13,7 +13,7 @@ from eflux.utils import (
 
 def test_get_flux_bounds(cobra_model):
     """Test flux bounds for r1 and r2."""
-    _, flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"])
+    flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"])
 
     assert flux_bounds.loc["r2", "minimum"] == 0.01
     assert flux_bounds.loc["r2", "maximum"] == 5
@@ -24,7 +24,7 @@ def test_get_flux_bounds(cobra_model):
 def test_get_flux_bounds_with_zero_threshold(cobra_model):
     """Test flux bounds for r1 and r2 with a zero threshold defined."""
     # Get flux bounds for r1 and r2 with a zero threshold
-    _, flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"], zero_threshold=0.1)
+    flux_bounds = get_flux_bounds(cobra_model, ["r1", "r4"], zero_threshold=0.1)
 
     # Check that flux bounds are set correctly
     assert flux_bounds.loc["r2", "minimum"] == 0

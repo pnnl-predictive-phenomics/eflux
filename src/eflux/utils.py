@@ -10,7 +10,6 @@ from cobra import Gene, Reaction
 def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: float = 1e-9) -> Tuple[cobra.Model, pd.DataFrame]:
     """Get flux bounds from FVA to use in surrogate model of reference strain.
 
-    The model is optimized to get flux bounds for all reactions by running FVA, except for those in rxn_list (fixed).
     Note: FVA = flux variability analysis
     inputs:
         model: cobra model
@@ -19,23 +18,17 @@ def get_flux_bounds(model: cobra.Model, rxn_list: list[str], zero_threshold: flo
     outputs:
         flux_bounds: flux min and max values to be used as a representative bounds of the reference strain.
     """
-    # Get optimized fluxes
-    opt_df = model.optimize().to_frame()
-
-    # Set bounds for reactions of interest using optimized values
-    for rxn in rxn_list:
-        model.reactions.get_by_id(rxn).lower_bound = opt_df.loc[rxn, 'fluxes']
-
     # Run FVA to get (reasonably) tight bounds for all other reactions
     keep_rxn_list = [r.id for r in model.reactions if (r.id not in rxn_list)]
     flux_bounds = cobra.flux_analysis.flux_variability_analysis(model=model, reaction_list=keep_rxn_list,
                                                                fraction_of_optimum=0.85, processes=8)
+    # Round values smaller than zero_threshold to zero
     for c in flux_bounds.columns:
         for r in flux_bounds.index:
-            if (flux_bounds[c][r] > -1 * zero_threshold) and (flux_bounds[c][r] < zero_threshold):
+            if (abs(flux_bounds[c][r]) <= abs(zero_threshold)):
                 flux_bounds[c][r] = 0
 
-    return model, flux_bounds
+    return flux_bounds
 
 
 def get_gpr_dict(model: cobra.Model) -> dict[Reaction, list[list[Gene]]]:
