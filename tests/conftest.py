@@ -69,11 +69,24 @@ def expression():
 
 @pytest.fixture(name="input_transcriptomics")
 def input_transcriptomics():
-    """Fixture for testing transcriptomics data."""
+    """Fixture for testing transcriptomics input data."""
     return pd.DataFrame(
         {"strain1": [1, 2, 3, 4, 5], "strain2": [5, 4, 3, 2, 1]},
         index=["gene1", "gene2", "gene3", "gene5", "gene6"],
     )
+
+
+@pytest.fixture(name="expected_enzyme_activity")
+def expected_enzyme_activity():
+    """Fixture for testing expected enzyme activity output."""
+    expected_df = pd.DataFrame(
+        {
+            "Reaction_ID": ["r1", "r2", "r3", "r4"],
+            "strain1": [np.nan, 1.0, np.inf, np.nan],
+            "strain2": [np.nan, 4.0, np.inf, np.nan],
+        }
+    )
+    return expected_df.set_index("Reaction_ID")
 
 
 @pytest.fixture(
@@ -152,6 +165,14 @@ def good_ref_col():
 def good_target_col():
     """Fixture for good target column."""
     return 'target_cond'
+
+
+@pytest.fixture(
+        name="input_upper_bounds",
+)
+def input_upper_bounds():
+    """Fixture normalized enzyme activity input."""
+    return {'r1': 1000.0, 'r2': 10.0, 'r3': 5.0, 'r4': 1000.0, 'r5': 1000.0}
 
 
 @pytest.fixture(

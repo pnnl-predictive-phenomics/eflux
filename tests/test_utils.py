@@ -62,49 +62,41 @@ def test_gpr_dict_for_model_with_multiple_gene_reaction_rules(cobra_model_2):
     }
 
 
-def test_enzyme_activity_for_no_genes(cobra_model_2, expression):
-    """Test enzyme_activity for reaction with no genes."""
+def test_gene_expression_to_enzyme_activity(cobra_model_2, expression):
+    """Test gene_expression_to_enzyme_activity function in utils.py."""
+    # Test enzyme_activity for reaction with no genes.
     r1 = cobra_model_2.reactions.get_by_id("r1")
-    gpr = get_gpr_dict(cobra_model_2)
-    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
+    gpr0 = get_gpr_dict(cobra_model_2)
+    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr0, expression)
     assert np.isnan(result[r1])
 
-
-def test_enzyme_activity_for_one_gene(cobra_model_2, expression):
-    """Test enzyme_activity for reaction with one gene."""
-    r1 = cobra_model_2.reactions.get_by_id("r1")
+    # Test enzyme_activity for reaction with one gene.
     r1.gene_reaction_rule = "gene3"
-    gpr = get_gpr_dict(cobra_model_2)
-    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
+    gpr1 = get_gpr_dict(cobra_model_2)
+    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr1, expression)
     assert result[r1] == expression["gene3"]
 
-
-def test_enzyme_activity_for_multiple_genes(cobra_model_2, expression):
-    """Test enzyme_activity for reaction with multiple genes."""
+    # Test enzyme_activity for reaction with multiple genes.
     r2 = cobra_model_2.reactions.get_by_id("r2")
-    gpr = get_gpr_dict(cobra_model_2)
+    gpr2 = get_gpr_dict(cobra_model_2)
     expression["gene1"] = 0.0
     expression["gene2"] = 0.0
-    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
+    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr2, expression)
     assert result[r2] == 0.0
 
-
-def test_enzyme_activity_multiple_isozymes(cobra_model_2, expression):
-    """Test enzyme_activity for reaction with isozyme."""
+    # Test enzyme_activity for reaction with isozyme.
     r3 = cobra_model_2.reactions.get_by_id("r3")
-    gpr = get_gpr_dict(cobra_model_2)
+    gpr3 = get_gpr_dict(cobra_model_2)
     expression["gene7"] = 0.0
     expression["gene8"] = 0.0
-    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
+    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr3, expression)
     assert result[r3] == np.min([expression["gene5"], expression["gene6"]])
 
-
-def test_enzyme_activity_unobserved_gene(cobra_model_2, expression):
-    """Test enzyme_activity for reaction with unobserved gene."""
+    # Test enzyme_activity for reaction with unobserved gene.
     r4 = cobra_model_2.reactions.get_by_id("r4")
     r4.gene_reaction_rule = "gene9"
-    gpr = get_gpr_dict(cobra_model_2)
-    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr, expression)
+    gpr4 = get_gpr_dict(cobra_model_2)
+    result = gene_expression_to_enzyme_activity(cobra_model_2, gpr4, expression)
     assert result[r4] == np.inf
 
 
@@ -119,34 +111,21 @@ def test_enzyme_activity_unobserved_gene(cobra_model_2, expression):
 #     return model
 
 
-def test_empty_data_empty_model(input_transcriptomics, cobra_model):
-    """Test convert_transcriptomics_to_enzyme_activity for empty data and empty model."""
+def test_convert_transcriptomics_to_enzyme_activity(cobra_model_2, input_transcriptomics, expected_enzyme_activity):
+    """Test convert_transcriptomics_to_enzyme_activity function in utils.py."""
+    # Test convert_transcriptomics_to_enzyme_activity for empty data and empty model
     result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), Model())
     assert result.empty
 
-
-def test_non_empty_data_empty_model(input_transcriptomics, cobra_model):
-    """Test convert_transcriptomics_to_enzyme_activity for non-empty data and empty model."""
+    # Test convert_transcriptomics_to_enzyme_activity for non-empty data and empty model
     result = convert_transcriptomics_to_enzyme_activity(input_transcriptomics, Model())
     assert result.empty
 
-
-def test_empty_data_non_empty_model(input_transcriptomics, cobra_model_2):
-    """Test convert_transcriptomics_to_enzyme_activity for empty data and non-empty model."""
+    # Test convert_transcriptomics_to_enzyme_activity for empty data and non-empty model
     result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), cobra_model_2)
     assert result.empty
 
-
-def test_non_empty_data_non_empty_model(input_transcriptomics, cobra_model_2):
-    """Test convert_transcriptomics_to_enzyme_activity for non-empty data and non-empty model."""
+    # Test convert_transcriptomics_to_enzyme_activity for non-empty data and non-empty model
     result = convert_transcriptomics_to_enzyme_activity(input_transcriptomics, cobra_model_2)
-    expected_df = pd.DataFrame(
-        {
-            "Reaction_ID": ["r1", "r2", "r3", "r4"],
-            "strain1": [np.nan, 1.0, np.inf, np.nan],
-            "strain2": [np.nan, 4.0, np.inf, np.nan],
-        }
-    )
-    expected_df = expected_df.set_index("Reaction_ID")
     assert result.shape == (4, 2)
-    assert result.equals(expected_df)
+    assert result.equals(expected_enzyme_activity)
