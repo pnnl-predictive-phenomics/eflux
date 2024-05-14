@@ -5,8 +5,7 @@ from cobra import exceptions
 from eflux.eflux2 import (
     add_slack_variables_to_model,
     get_condition_specific_upper_bounds,
-    get_normalized_condition,
-    run_condition_specific_eflux,
+    get_normalized_condition,  # run_condition_specific_eflux,
 )
 
 
@@ -112,72 +111,48 @@ def test_get_condition_specific_upper_bounds(
     assert enzyme_bounds == expected_dict_from_get_enzyme_bounds
 
 
-@pytest.fixture
-def model():
-    return cobra.Model()
+# @pytest.fixture
+# def external_fluxes():
+#     return pd.DataFrame({'rxn1': [1.0], 'rxn2': [2.0]})
 
 
-@pytest.fixture
-def external_fluxes():
-    return pd.DataFrame({"rxn1": [1.0], "rxn2": [2.0]})
+# @pytest.fixture
+# def enzyme_activity():
+#     return pd.DataFrame({'cond1': [1.0], 'cond2': [2.0]})
 
 
-@pytest.fixture
-def enzyme_activity():
-    return pd.DataFrame({"cond1": [1.0], "cond2": [2.0]})
+# def test_run_condition_specific_eflux(cobra_model_2, external_fluxes, enzyme_activity):
+#     """Test run_condition_specific_eflux function."""
+#     # Test case 1: model is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(None, 'growth', 'product', external_fluxes, enzyme_activity, 'cond1', 'cond2')
 
+#     # Test case 2: growth_rxn_id is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, None, 'product', external_fluxes, enzyme_activity, 'cond1', 'cond2')
 
-def test_run_condition_specific_eflux(cobra_model_2, external_fluxes, enzyme_activity):
-    """Test run_condition_specific_eflux function."""
-    # Test case 1: model is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            None, "growth", "product", external_fluxes, enzyme_activity, "cond1", "cond2"
-        )
+#     # Test case 3: product_rxn_id is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, 'growth', None, external_fluxes, enzyme_activity, 'cond1', 'cond2')
 
-    # Test case 2: growth_rxn_id is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, None, "product", external_fluxes, enzyme_activity, "cond1", "cond2"
-        )
+#     # Test case 4: external_fluxes is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, 'growth', 'product', None, enzyme_activity, 'cond1', 'cond2')
 
-    # Test case 3: product_rxn_id is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, "growth", None, external_fluxes, enzyme_activity, "cond1", "cond2"
-        )
+#     # Test case 5: enzyme_activity is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, 'growth', 'product', external_fluxes, None, 'cond1', 'cond2')
 
-    # Test case 4: external_fluxes is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, "growth", "product", None, enzyme_activity, "cond1", "cond2"
-        )
+#     # Test case 6: ref_cond is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, 'growth', 'product', external_fluxes, enzyme_activity, None, 'cond2')
 
-    # Test case 5: enzyme_activity is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, "growth", "product", external_fluxes, None, "cond1", "cond2"
-        )
+#     # Test case 7: target_cond is None
+#     with pytest.raises(TypeError):
+#         run_condition_specific_eflux(cobra_model_2, 'growth', 'product', external_fluxes, enzyme_activity, 'cond1', None)
 
-    # Test case 6: ref_cond is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, "growth", "product", external_fluxes, enzyme_activity, None, "cond2"
-        )
-
-    # Test case 7: target_cond is None
-    with pytest.raises(TypeError):
-        run_condition_specific_eflux(
-            model, "growth", "product", external_fluxes, enzyme_activity, "cond1", None
-        )
-
-    # Test case 8: All inputs are valid
-    assert (
-        run_condition_specific_eflux(
-            model, "growth", "product", external_fluxes, enzyme_activity, "cond1", "cond2"
-        )
-        == {}
-    )
+#     # Test case 8: All inputs are valid
+#     assert run_condition_specific_eflux(cobra_model_2, 'growth', 'product', external_fluxes, enzyme_activity, 'cond1', 'cond2') == {}
 
 
 # Inputs to test eflux

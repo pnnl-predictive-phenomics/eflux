@@ -111,7 +111,9 @@ def test_gene_expression_to_enzyme_activity(cobra_model_2, expression):
 #     return model
 
 
-def test_convert_transcriptomics_to_enzyme_activity(cobra_model_2, input_transcriptomics, expected_enzyme_activity):
+def test_convert_transcriptomics_to_enzyme_activity(
+    cobra_model_2, input_transcriptomics, expected_enzyme_activity
+):
     """Test convert_transcriptomics_to_enzyme_activity function in utils.py."""
     # Test convert_transcriptomics_to_enzyme_activity for empty data and empty model
     result = convert_transcriptomics_to_enzyme_activity(pd.DataFrame(), Model())

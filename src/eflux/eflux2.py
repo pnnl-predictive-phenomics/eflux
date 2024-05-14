@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 
 
-def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000) -> cobra.Model:
+def add_slack_variables_to_model(
+    model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000
+) -> cobra.Model:
     """Add slack variables to model.
 
     inputs:
@@ -32,16 +34,17 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     for r_id, bound in upper_bounds.items():
         # Create slack variable for each reaction
         this_rxn = relaxed_model.reactions.get_by_id(r_id)
-        this_slack_var = relaxed_model.problem.Variable('SLACK_' + r_id, lb=0)
+        this_slack_var = relaxed_model.problem.Variable("SLACK_" + r_id, lb=0)
         slack_vars.append(this_slack_var)
         # Add a constraint between the reaction flux and the slack variable using the upper bound
-        constraint = relaxed_model.problem.Constraint(this_rxn.flux_expression - this_slack_var, lb=0, ub=bound)
+        constraint = relaxed_model.problem.Constraint(
+            this_rxn.flux_expression - this_slack_var, lb=0, ub=bound
+        )
         relaxed_model.add_cons_vars(constraint)
 
     # Define a new combined objective
     combined_objective = relaxed_model.problem.Objective(
-        relaxed_model.objective.expression - slack_weight * sum(slack_vars),
-        direction='max'
+        relaxed_model.objective.expression - slack_weight * sum(slack_vars), direction="max"
     )
 
     # Set the combined objective as the objective of the model
@@ -50,7 +53,9 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     return relaxed_model
 
 
-def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str) -> dict[str, float]:
+def get_normalized_condition(
+    df: pd.DataFrame, *, ref_col: str, target_col: str
+) -> dict[str, float]:
     """Create dictionary of normalized/relative scale factors for a target condition w.r.t. a reference condition.
 
     inputs:
@@ -73,7 +78,10 @@ def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str)
 
     return norm_cond_dict
 
-def get_condition_specific_upper_bounds(fva_upper_bounds: dict[str, float], scaling_factors: dict) -> dict[str, float]:
+
+def get_condition_specific_upper_bounds(
+    fva_upper_bounds: dict[str, float], scaling_factors: dict
+) -> dict[str, float]:
     """Get upper bounds for one experimental condition/strain only.
 
     inputs:
@@ -88,9 +96,14 @@ def get_condition_specific_upper_bounds(fva_upper_bounds: dict[str, float], scal
 
 
 def run_condition_specific_eflux(
-        model: cobra.Model, growth_rxn_id: str, product_rxn_id: str,
-        external_fluxes: pd.DataFrame, enzyme_activity: pd.DataFrame,
-        ref_cond: str, target_cond: str) -> dict[str, float]:  # or -> pd.DataFrame
+    model: cobra.Model,
+    growth_rxn_id: str,
+    product_rxn_id: str,
+    external_fluxes: pd.DataFrame,
+    enzyme_activity: pd.DataFrame,
+    ref_cond: str,
+    target_cond: str,
+) -> dict[str, float]:  # or -> pd.DataFrame
     """Run eflux for one strain/experimental condition.
 
     inputs:
@@ -106,20 +119,17 @@ def run_condition_specific_eflux(
     """
     return {}
 
+    # def adjust_reaction_bounds(model: cobra.Model, flux_bounds: pd.DataFrame) -> cobra.Model:
+    #     """Adjust reaction bounds by FVA."""
+    #     new_model = model.copy()
 
-# def adjust_reaction_bounds(model: cobra.Model, flux_bounds: pd.DataFrame) -> cobra.Model:
-#     """Adjust reaction bounds by FVA."""
-#     new_model = model.copy()
+    #     for r in flux_bounds.index:
+    #         new_model.reactions.get_by_id(r).lower_bound = 0
+    #         new_model.reactions.get_by_id(r).upper_bound = flux_bounds.loc[r, "maximum"]
 
-#     for r in flux_bounds.index:
-#         new_model.reactions.get_by_id(r).lower_bound = 0
-#         new_model.reactions.get_by_id(r).upper_bound = flux_bounds.loc[r, "maximum"]
+    #     return new_model
 
-#     return new_model
-
-
-
-# def prep_model_for_eflux(model: cobra.Model) -> cobra.Model:
+    # def prep_model_for_eflux(model: cobra.Model) -> cobra.Model:
     """Check model feasiblity and adjust bounds using FVA."""
     # Check if model is feasible
 
