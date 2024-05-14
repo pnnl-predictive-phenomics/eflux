@@ -9,7 +9,7 @@ def add_slack_variables_to_model(model: cobra.Model, upper_bounds: dict[str, flo
     """Add slack variables to model.
 
     inputs:
-        model: cobra model with objective already defined
+        model: cobra model with objective already defined (TBD, maybe as optional.....and upper bounds defined by FVA)
         upper_bounds: dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one
                       strain/experimental condition (e.g. scaled/normalized enzyme activity or external fluxes)
         slack_weight: weight of slack variables relative to model.objective
@@ -74,23 +74,64 @@ def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str)
     return norm_cond_dict
 
 
-def get_upper_bounds(model: cobra.Model, scaling_factors: dict) -> dict[str, float]:
-    """Get upper bounds.
+def get_condition_specific_upper_bounds(fva_upper_bounds: dict[str, float], scaling_factors: dict) -> dict[str, float]:
+    """Get upper bounds for one experimental condition/strain only.
 
     inputs:
-        model: cobra model with reaction bounds adjusted by FVA
+        fva_upper_bounds: dictionary of reaction ids (keys) and upper bounds from FVA (values)
         scaling_factors: dict of of reaction id (keys) and scaling_factors (values) obtained by
                         normalizing observed data for one strain/experimental condition with
                         respect to a reference condition
     outputs:
-        bounds_dict: dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
+        dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
     """
-    bounds_dict = {}
-    for rxn in model.reactions:
-        if rxn.id in scaling_factors:
-            bounds_dict[rxn.id] = rxn.upper_bound * scaling_factors[rxn.id]
+    return {r: b * scaling_factors[r] for r, b in fva_upper_bounds.items() if r in scaling_factors}
 
-    return bounds_dict
+
+def run_condition_specific_eflux(
+        model: cobra.Model, growth_rxn_id: str, product_rxn_id: str,
+        external_fluxes: pd.DataFrame, enzyme_activity: pd.DataFrame,
+        ref_cond: str, target_cond: str) -> dict[str, float]:  # or -> pd.DataFrame
+    """Run eflux for one strain/experimental condition.
+
+    inputs:
+        model: cobra model with objective already defined
+        growth_rxn_id: reaction id for growth
+        product_rxn_id: reaction id for product
+        external_fluxes: dataframe of external fluxes
+        enzyme_activity: dataframe of enzyme activity
+        ref_cond: reference condition (column of both external_fluxes and enzyme_activity)
+        target_cond: target condition (column of both external_fluxes and enzyme_activity)
+    outputs:
+        fluxes: dictionary of reaction ids (keys) and flux values (values)
+    """
+    return {}
+
+
+# def adjust_reaction_bounds(model: cobra.Model, flux_bounds: pd.DataFrame) -> cobra.Model:
+#     """Adjust reaction bounds by FVA."""
+#     new_model = model.copy()
+
+#     for r in flux_bounds.index:
+#         new_model.reactions.get_by_id(r).lower_bound = 0
+#         new_model.reactions.get_by_id(r).upper_bound = flux_bounds.loc[r, "maximum"]
+
+#     return new_model
+
+
+
+# def prep_model_for_eflux(model: cobra.Model) -> cobra.Model:
+    """Check model feasiblity and adjust bounds using FVA."""
+    # Check if model is feasible
+
+    # Check model growth rate
+
+    # Check model production rate
+
+    # Set model tolerance
+    # model.tolerance = tolerance
+
+    # Run FVA to get flux bounds for all reactions,  external reactions
 
 
 # Main function expected flow:
