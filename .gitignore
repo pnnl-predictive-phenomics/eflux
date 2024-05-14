@@ -6,9 +6,6 @@ dist/
 wheels/
 *.egg-info
 
-# venv
-.venv
-
 # emacs autosaves
 *~
 
@@ -17,3 +14,27 @@ wheels/
 
 # pytest
 .pytest_cache
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride

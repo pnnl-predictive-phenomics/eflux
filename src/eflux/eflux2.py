@@ -73,7 +73,6 @@ def get_normalized_condition(df: pd.DataFrame, *, ref_col: str, target_col: str)
 
     return norm_cond_dict
 
-
 def get_condition_specific_upper_bounds(fva_upper_bounds: dict[str, float], scaling_factors: dict) -> dict[str, float]:
     """Get upper bounds for one experimental condition/strain only.
 
