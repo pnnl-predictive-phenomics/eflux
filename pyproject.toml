@@ -7,8 +7,8 @@ authors = [
 ]
 maintainers = [
   { name = "Jeremy Zucker", email = "djinnome@gmail.com"},
-  { name = "mcnaughtonadm", email = "mcnaughtonadm@gmail.com"},
-  { name = "ShantMahserejian", email = "shant.mahserejian@pnnl.gov"}
+  { name = "Andrew McNaughton", email = "mcnaughtonadm@gmail.com"},
+  { name = "Shant Mahserejian", email = "shant.mahserejian@pnnl.gov"}
 ]
 
 license = { text = "BSD 2-Clause License"}
