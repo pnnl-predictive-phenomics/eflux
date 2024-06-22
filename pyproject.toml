@@ -1,13 +1,38 @@
 [project]
 name = "eflux"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "Predict flux data from a cobra model and expression data."
+authors = [
+  { name = "Jeremy Zucker", email = "djinnome@gmail.com"},
+]
+maintainers = [
+  { name = "Jeremy Zucker", email = "djinnome@gmail.com"},
+  { name = "Andrew McNaughton", email = "mcnaughtonadm@gmail.com"},
+  { name = "Shant Mahserejian", email = "shant.mahserejian@pnnl.gov"}
+]
+
+license = { text = "BSD 2-Clause License"}
+keywords = ["fluxomics", "omics", "cobra"]
 dependencies = [
     "cobra>=0.29.0",
     "click>=8.1.7",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
+Homepage = "https://github.com/pnnl-predictive-phenomics/eflux"
+Repository = "https://github.com/pnnl-predictive-phenomics/eflux.git"
+Issues = "https://github.com/pnnl-predictive-phenomics/eflux/issues"
 
 [build-system]
 requires = ["hatchling"]
@@ -21,6 +46,9 @@ dev-dependencies = [
     "python-lsp-server>=1.11.0",
     "python-lsp-ruff>=2.2.1",
     "pytest>=8.2.0",
+    "pyroma>=4.2",
+    "mypy>=1.10.0",
+    "pylsp-mypy>=0.6.8",
 ]
 
 [tool.isort]
@@ -114,6 +142,9 @@ line-ending = "auto"
 
 [tool.ruff.lint.mccabe]
 max-complexity = 20
+
+[tool.mypy]
+ignore_missing_imports = true
 
 [tool.hatch.metadata]
 allow-direct-references = true

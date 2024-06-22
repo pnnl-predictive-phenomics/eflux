@@ -31,7 +31,7 @@ def get_max_flux_bounds(
     return max_flux_bounds
 
 
-def get_gpr_dict(model: cobra.Model) -> dict[Reaction, list[list[Gene]]]:
+def get_gpr_dict(model: cobra.Model) -> dict[Reaction, set[frozenset[Gene]]]:
     """Gene reaction rule (GPR) for each reaction in the model.
 
     inputs:
@@ -53,7 +53,7 @@ def get_gpr_dict(model: cobra.Model) -> dict[Reaction, list[list[Gene]]]:
 
 
 def gene_expression_to_enzyme_activity(
-    model: cobra.Model, gpr: dict[Reaction, list[list[Gene]]], expression: dict[Gene, float]
+    model: cobra.Model, gpr: dict[Reaction, set[frozenset[Gene]]], expression: dict[Gene, float]
 ) -> dict[Reaction, float]:
     """Map gene expression to enzyme activity inputs.
 
