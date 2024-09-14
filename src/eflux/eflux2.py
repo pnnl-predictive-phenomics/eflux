@@ -1,8 +1,12 @@
 """Script to run the Eflux2 Algorithm."""
 
+from typing import Optional
+
 import cobra
 import numpy as np
 import pandas as pd
+
+from eflux.utils import get_max_flux_bounds, load_model_from_path
 
 
 def add_slack_variables_to_model(
@@ -154,3 +158,61 @@ def run_condition_specific_eflux(
 # 8) Get bounds for all reactions with corresponding observed data (from both enzyme activity and external fluxes)
 # 9) Run model constraints while using slack variables (add_slack_variables_to_model)
 # 10) Run FBA and output fluxes
+
+
+def eflux3(
+    model_path: str, data_path: str, *, reference_col: str, objective: Optional[str] = None
+) -> pd.DataFrame:
+    """Run the Eflux3 workflow.
+
+    Parameters
+    ----------
+        model_path : str
+            The path to the CobraPy compliant model for running eflux on.
+        data_path : str
+            The path to the transcriptomics data to condition the fluxes on.
+        reference_col: str
+            The column name of the reference column.
+
+    Returns
+    -------
+        df : pd.DataFrame
+
+    """
+    enzyme_activity = pd.read_csv(data_path, index_col="Reaction_ID")
+
+    model = load_model_from_path(model_path)
+    # model.reactions.BIOMASS__1.lower_bound = 0.01
+    # model.reactions.EX_sucr_e.lower_bound = 0.0
+
+    if objective is not None:
+        model.objective = objective
+
+    fva_upper_bounds: dict[str, float] = get_max_flux_bounds(
+        model,
+        rxn_list=[],
+    )  # ['EX_sucr_e', 'EX_photon650_e', 'EX_photon690_e', 'EX_co2_e', 'BIOMASS__1'])
+
+    condition_specific_upper_bounds = {
+        condition: get_condition_specific_upper_bounds(
+            fva_upper_bounds, enzyme_activity[condition].dropna().to_dict()
+        )
+        for condition in enzyme_activity
+    }
+    condition_specific_models = {
+        condition: add_slack_variables_to_model(model, upper_bounds)
+        for condition, upper_bounds in condition_specific_upper_bounds.items()
+    }
+
+    condition_specific_fluxes = pd.DataFrame(
+        {
+            condition: condition_specific_model.optimize().fluxes
+            for condition, condition_specific_model in condition_specific_models.items()
+        }
+    )
+
+    fluxes = condition_specific_fluxes
+    # fluxes.to_csv('../data/circadian_experiments/processed_data/enzyme_constrained_fluxes.csv')
+    fluxes.to_csv(
+        "../data/circadian_experiments/processed_data/enzyme_constrained_fluxes_nocofactorsinmodel.csv"
+    )

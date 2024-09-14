@@ -1,24 +1,29 @@
 """Utils module for eflux package."""
 
-from typing import Tuple
+from pathlib import Path
 
 import cobra
 import numpy as np
 import pandas as pd
 from cobra import Gene, Reaction
+from cobra.io import load_json_model, load_matlab_model, load_yaml_model, read_sbml_model
 
 
 def get_max_flux_bounds(
     model: cobra.Model, rxn_list: list[str], precision: int = 9
-) -> Tuple[cobra.Model, pd.DataFrame]:
+) -> dict[str, float]:
     """Get flux bounds from FVA to use in surrogate model of reference strain.
 
     Note: FVA = flux variability analysis
-    inputs:
+
+    Parameters
+    ----------
         model: cobra model
         rxn_list: list of reactions of interest, corresponding to reference strain selection criteria
         zero_threshold: magnitude threshold to identify and replace numerically zero flux values
-    outputs:
+
+    Returns
+    -------
         max_flux_bounds: max flux values to be used as a representative bounds of the reference strain.
     """
     # Run FVA to get (reasonably) tight bounds for all other reactions
@@ -129,3 +134,36 @@ def convert_transcriptomics_to_enzyme_activity(
         return pd.DataFrame()
 
     return enzyme_activity_df.set_index("Reaction_ID")
+
+
+def load_model_from_path(model_path: str) -> cobra.Model:
+    """Load a cobrapy model from a path, with any compatible extension.
+
+    Parameters
+    ----------
+        model_path : str
+            The path to the cobrapy model, can be any extension of xml, sbml, json, yml.
+
+    Returns
+    -------
+        cobra.Model
+            A cobrapy model
+
+    Note
+    ----
+        Currently not supporting .mat file extensions
+    """
+    path = Path(model_path)
+
+    if path.suffix in (".xml", ".sbml"):
+        model = read_sbml_model(path)
+    elif path.suffix == ".yml":
+        model = load_yaml_model(path)
+    elif path.suffix == ".json":
+        model = load_json_model(path)
+    # elif path.suffix == ".mat":
+    #     model = load_matlab_model(path)
+    else:
+        raise ValueError(f"Unsupported model file extension: {path.suffix}")
+
+    return model

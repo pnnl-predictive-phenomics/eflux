@@ -79,11 +79,13 @@ def input_transcriptomics():
 @pytest.fixture(name="expected_enzyme_activity")
 def expected_enzyme_activity():
     """Fixture for testing expected enzyme activity output."""
-    expected_df = pd.DataFrame({
-        "Reaction_ID": ["r1", "r2", "r3", "r4"],
-        "strain1": [np.nan, 1.0, np.inf, np.nan],
-        "strain2": [np.nan, 4.0, np.inf, np.nan],
-    })
+    expected_df = pd.DataFrame(
+        {
+            "Reaction_ID": ["r1", "r2", "r3", "r4"],
+            "strain1": [np.nan, 1.0, np.inf, np.nan],
+            "strain2": [np.nan, 4.0, np.inf, np.nan],
+        }
+    )
     return expected_df.set_index("Reaction_ID")
 
 
@@ -191,3 +193,17 @@ def input_normalized_enzyme_activity():
 def expected_dict_from_get_enzyme_bounds():
     """Fixture for expected bounds from enzyme activity for output comparison."""
     return {"r1": 750.0, "r2": 12.5, "r3": 0.5, "r4": 1100.0}
+
+
+@pytest.fixture(
+    name="valid_model_paths",
+)
+def valid_model_paths():
+    """Fixture to provide paths to valid model files of different formats."""
+    return {
+        "sbml-xml": "tests/test_models/test_model.xml",
+        "sbml": "tests/test_models/test_model.sbml",
+        "json": "tests/test_models/test_model.json",
+        "yaml": "tests/test_models/test_model.yml",
+        #        "mat": "tests/test_models/test_model.mat",
+    }
