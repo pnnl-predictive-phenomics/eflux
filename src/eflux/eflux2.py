@@ -10,17 +10,26 @@ from eflux.utils import get_max_flux_bounds, load_model_from_path
 
 
 def add_slack_variables_to_model(
-    model: cobra.Model, upper_bounds: dict[str, float], slack_weight: float = 1000
+    model: cobra.Model,
+    upper_bounds: dict[str, float],
+    slack_weight: float = 1000,
 ) -> cobra.Model:
     """Add slack variables to model.
 
-    inputs:
-        model: cobra model with objective already defined (TBD, maybe as optional.....and upper bounds defined by FVA)
-        upper_bounds: dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one
-                      strain/experimental condition (e.g. scaled/normalized enzyme activity or external fluxes)
-        slack_weight: weight of slack variables relative to model.objective
-    outputs:
-        model: cobra model constrained using upper bounds, but relaxed using slack variables
+    Parameters
+    ----------
+        model : cobra.Model
+            cobra model with objective already defined (TBD, maybe as optional.....and upper bounds defined by FVA)
+        upper_bounds : dict[str, float]
+            dict (or dataframe column) of reaction id keys and upper bound values for fluxes corresponding to one
+            strain/experimental condition (e.g. scaled/normalized enzyme activity or external fluxes)
+        slack_weight : float, Optional
+            weight of slack variables relative to model.objective (default is 1000)
+
+    Returns
+    -------
+        model : cobra.Model
+            cobra model constrained using upper bounds, but relaxed using slack variables
     """
     # Check for correct input types
     if model is None:
@@ -62,12 +71,19 @@ def get_normalized_condition(
 ) -> dict[str, float]:
     """Create dictionary of normalized/relative scale factors for a target condition w.r.t. a reference condition.
 
-    inputs:
-        df: observed data with reaction ids as rownames, and column names of experimental conditions that include the reference and target
-        ref_col: column name for the reference condition
-        target_col: column name for the target condition
-    ouptut:
-        norm_cond_dict: a dictionary of reaction ids (keys) mapped to scaling factors (values)
+    Parameters
+    ----------
+        df : pd.DataFrame
+            observed data with reaction ids as rownames, and column names of experimental conditions that include the reference and target.
+        ref_col : str
+            column name for the reference condition.
+        target_col : str
+            column name for the target condition.
+
+    Returns
+    -------
+        norm_cond_dict : dict[str, float]
+            A dictionary of reaction ids (keys) mapped to scaling factors (values).
     """
     # Check zero or inf or nan entries in ref_col
     if np.any(df[ref_col] == 0) or np.any(np.isinf(df[ref_col])) or np.any(np.isnan(df[ref_col])):
@@ -88,13 +104,18 @@ def get_condition_specific_upper_bounds(
 ) -> dict[str, float]:
     """Get upper bounds for one experimental condition/strain only.
 
-    inputs:
-        fva_upper_bounds: dictionary of reaction ids (keys) and upper bounds from FVA (values)
-        scaling_factors: dict of of reaction id (keys) and scaling_factors (values) obtained by
-                        normalizing observed data for one strain/experimental condition with
-                        respect to a reference condition
-    outputs:
-        dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
+    Parameters
+    ----------
+        fva_upper_bounds : dict[str, float]
+            dictionary of reaction ids (keys) and upper bounds from FVA (values)
+        scaling_factors : dict
+            dict of reaction id (keys) and scaling_factors (values) obtained by normalizing observed data
+            for one strain/experimental condition with respect to a reference condition.
+
+    Returns
+    -------
+        dict[str, float]
+            dict of reaction id (keys) and upper bound on model reaction fluxes (values) for corresponding to one strain/experimental condition
     """
     return {r: b * scaling_factors[r] for r, b in fva_upper_bounds.items() if r in scaling_factors}
 
@@ -110,16 +131,27 @@ def run_condition_specific_eflux(
 ) -> dict[str, float]:  # or -> pd.DataFrame
     """Run eflux for one strain/experimental condition.
 
-    inputs:
-        model: cobra model with objective already defined
-        growth_rxn_id: reaction id for growth
-        product_rxn_id: reaction id for product
-        external_fluxes: dataframe of external fluxes
-        enzyme_activity: dataframe of enzyme activity
-        ref_cond: reference condition (column of both external_fluxes and enzyme_activity)
-        target_cond: target condition (column of both external_fluxes and enzyme_activity)
-    outputs:
-        fluxes: dictionary of reaction ids (keys) and flux values (values)
+    Parameters
+    ----------
+        model : cobra.Model
+            Cobra model with objective already defined
+        growth_rxn_id : str
+            Reaction id for growth
+        product_rxn_id : str
+            Reaction id for product
+        external_fluxes : pd.DataFrame
+            Dataframe of external fluxes
+        enzyme_activity : pd.DataFrame
+            Dataframe of enzyme activity
+        ref_cond : str
+            Reference condition (column of both external_fluxes and enzyme_activity)
+        target_cond : str
+            Target condition (column of both external_fluxes and enzyme_activity)
+
+    Returns
+    -------
+        fluxes : dict[str, float]
+            dictionary of reaction ids (keys) and flux values (values)
     """
     return {}
 
@@ -173,10 +205,13 @@ def eflux3(
             The path to the transcriptomics data to condition the fluxes on.
         reference_col: str
             The column name of the reference column.
+        objective : Optional[str]
+            The desired objective reaction to use (default is None)
 
     Returns
     -------
         df : pd.DataFrame
+            Condition specific fluxes from data for given cobra model.
 
     """
     enzyme_activity = pd.read_csv(data_path, index_col="Reaction_ID")
@@ -204,12 +239,10 @@ def eflux3(
         for condition, upper_bounds in condition_specific_upper_bounds.items()
     }
 
-    condition_specific_fluxes = pd.DataFrame(
-        {
-            condition: condition_specific_model.optimize().fluxes
-            for condition, condition_specific_model in condition_specific_models.items()
-        }
-    )
+    condition_specific_fluxes = pd.DataFrame({
+        condition: condition_specific_model.optimize().fluxes
+        for condition, condition_specific_model in condition_specific_models.items()
+    })
 
     fluxes = condition_specific_fluxes
     # fluxes.to_csv('../data/circadian_experiments/processed_data/enzyme_constrained_fluxes.csv')

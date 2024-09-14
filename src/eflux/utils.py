@@ -6,7 +6,7 @@ import cobra
 import numpy as np
 import pandas as pd
 from cobra import Gene, Reaction
-from cobra.io import load_json_model, load_matlab_model, load_yaml_model, read_sbml_model
+from cobra.io import load_json_model, load_yaml_model, read_sbml_model
 
 
 def get_max_flux_bounds(
@@ -39,10 +39,14 @@ def get_max_flux_bounds(
 def get_gpr_dict(model: cobra.Model) -> dict[Reaction, set[frozenset[Gene]]]:
     """Gene reaction rule (GPR) for each reaction in the model.
 
-    inputs:
+    Parameters
+    ----------
         model: cobra model
-    outputs:
-        gpr_dict: dictionary of reactions to isozyme sets (corresponding genes from gene reaction rules)
+
+    Returns
+    -------
+        gpr_dict : dict[Reaction, set[frozenset[Gene]]]
+            dictionary of reactions to isozyme sets (corresponding genes from gene reaction rules)
     """
     # Parse GPR into a dict containing isozymes (separated by 'or')
     # Each isozyme has a set of subunits (separated by 'and')
@@ -62,12 +66,18 @@ def gene_expression_to_enzyme_activity(
 ) -> dict[Reaction, float]:
     """Map gene expression to enzyme activity inputs.
 
-    inputs:
-        model: cobra model
-        gpr: dictionary of reactions (keys) to list of list of genes (values) for the correpsonding gene reaction rule.
-        expression: dictionary of gene names (keys) to values from [likely] observed transcriptomics data.
-    outputs:
-        enzyme_activity: dictionary of reactions (keys) to corresponding isozyme activity from observed data (value).
+    Parameters
+    ----------
+        model : cobra model
+        gpr : dict[Reaction, set[frozenset[Gene]]]
+            dictionary of reactions (keys) to list of list of genes (values) for the correpsonding gene reaction rule.
+        expression : dict[Gene, float]
+            dictionary of gene names (keys) to values from [likely] observed transcriptomics data.
+
+    Returns
+    -------
+        enzyme_activity : dict[Reaction, float]
+            dictionary of reactions (keys) to corresponding isozyme activity from observed data (value).
     """
     enzyme_activity = {}
     for rxn in model.reactions:
@@ -97,12 +107,16 @@ def convert_transcriptomics_to_enzyme_activity(
 ) -> pd.DataFrame:
     """Convert transcriptomics data to enzyme activity.
 
-    inputs:
-        transcriptomics_data: dataframe of transcriptomics data
-        model: cobra model
-        # gpr: dictionary of reaction ids (keys) to list of list of genes (values) for the correpsonding gene reaction rule
-    outputs:
-        enzyme_activity_df: dataframe of enzyme activity converted from transcriptomics data
+    Parameters
+    ----------
+        transcriptomics_data : pd.DataFrame
+            Dataframe of transcriptomics data
+        model : cobra model
+
+    Returns
+    -------
+        enzyme_activity_df : pd.DataFrame
+            Dataframe of enzyme activity converted from transcriptomics data
     """
     # Initialize empty dataframe
     enzyme_activity_df = pd.DataFrame()

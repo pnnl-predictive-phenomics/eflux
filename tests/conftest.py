@@ -79,13 +79,11 @@ def input_transcriptomics():
 @pytest.fixture(name="expected_enzyme_activity")
 def expected_enzyme_activity():
     """Fixture for testing expected enzyme activity output."""
-    expected_df = pd.DataFrame(
-        {
-            "Reaction_ID": ["r1", "r2", "r3", "r4"],
-            "strain1": [np.nan, 1.0, np.inf, np.nan],
-            "strain2": [np.nan, 4.0, np.inf, np.nan],
-        }
-    )
+    expected_df = pd.DataFrame({
+        "Reaction_ID": ["r1", "r2", "r3", "r4"],
+        "strain1": [np.nan, 1.0, np.inf, np.nan],
+        "strain2": [np.nan, 4.0, np.inf, np.nan],
+    })
     return expected_df.set_index("Reaction_ID")
 
 
