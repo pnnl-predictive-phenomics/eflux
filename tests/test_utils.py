@@ -2,12 +2,14 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 from cobra.core.model import Model
 from eflux.utils import (
     convert_transcriptomics_to_enzyme_activity,
     gene_expression_to_enzyme_activity,
     get_gpr_dict,
     get_max_flux_bounds,
+    load_model_from_path,
 )
 
 
@@ -131,3 +133,17 @@ def test_convert_transcriptomics_to_enzyme_activity(
     result = convert_transcriptomics_to_enzyme_activity(input_transcriptomics, cobra_model_2)
     assert result.shape == (4, 2)
     assert result.equals(expected_enzyme_activity)
+
+
+def test_load_model_success(valid_model_paths):
+    """Test successful loading of models from different formats."""
+    for _, path in valid_model_paths.items():
+        model = load_model_from_path(path)
+        assert isinstance(model, Model)
+
+
+def test_load_model_invalid_extension():
+    """Test handling of unsupported file extensions."""
+    with pytest.raises(ValueError) as exc_info:
+        load_model_from_path("invalid_model.txt")
+    assert "Unsupported model file extension" in str(exc_info.value)

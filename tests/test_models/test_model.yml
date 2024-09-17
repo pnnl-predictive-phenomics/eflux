@@ -1,0 +1,52 @@
+!!omap
+- metabolites:
+  - !!omap
+    - id: A
+    - name: ''
+    - compartment: c
+  - !!omap
+    - id: B
+    - name: ''
+    - compartment: c
+  - !!omap
+    - id: C
+    - name: ''
+    - compartment: c
+  - !!omap
+    - id: D
+    - name: ''
+    - compartment: c
+- reactions:
+  - !!omap
+    - id: reaction1
+    - name: Reaction 1
+    - metabolites: !!omap
+      - A: -1.0
+      - B: 1.0
+    - lower_bound: 0.0
+    - upper_bound: 1000.0
+    - gene_reaction_rule: ''
+  - !!omap
+    - id: reaction2
+    - name: Reaction 2
+    - metabolites: !!omap
+      - B: -1.0
+      - C: 1.0
+    - lower_bound: 0.0
+    - upper_bound: 1000.0
+    - gene_reaction_rule: ''
+  - !!omap
+    - id: reaction3
+    - name: Reaction 3
+    - metabolites: !!omap
+      - C: -1.0
+      - D: 1.0
+    - lower_bound: 0.0
+    - upper_bound: 1000.0
+    - gene_reaction_rule: ''
+    - objective_coefficient: 1.0
+- genes: []
+- id: test_model
+- compartments: !!omap
+  - c: ''
+- version: '1.2'

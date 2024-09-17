@@ -1,9 +1,11 @@
 """Tests for eflux functions."""
 
+import pandas as pd
 import pytest
 from cobra import exceptions
-from eflux.eflux2 import (
+from eflux.eflux3 import (
     add_slack_variables_to_model,
+    eflux3,
     get_condition_specific_upper_bounds,
     get_normalized_condition,  # run_condition_specific_eflux,
 )
@@ -109,6 +111,15 @@ def test_get_condition_specific_upper_bounds(
     )
     assert isinstance(enzyme_bounds, dict)  # is this needed?
     assert enzyme_bounds == expected_dict_from_get_enzyme_bounds
+
+
+def test_eflux3(
+    cobra_model, input_transcriptomics, expected_eflux3_output, reference_col="strain2"
+):
+    """Test the eflux3 method."""
+    fluxes = eflux3(cobra_model, input_transcriptomics, reference_col=reference_col)
+    assert isinstance(fluxes, pd.DataFrame)
+    assert pd.testing.assert_frame_equal(fluxes, expected_eflux3_output, check_dtype=False)
 
 
 # @pytest.fixture

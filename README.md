@@ -13,9 +13,9 @@ Package to run E-Flux on `cobra` models with provided transcriptomics expression
 To get started run the following:
 
 ```python
-from eflux import eflux2
+from eflux import eflux3
 
-eflux2(cobra_model, transcriptomics)
+eflux3(cobra_model, transcriptomics)
 ```
 
 ## Installation 🪛
