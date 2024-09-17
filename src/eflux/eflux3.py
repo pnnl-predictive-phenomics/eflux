@@ -1,12 +1,19 @@
-"""Script to run the Eflux2 Algorithm."""
+"""Scripts to run the Eflux3 Algorithm."""
 
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 import cobra
 import numpy as np
 import pandas as pd
 
-from eflux.utils import get_max_flux_bounds, load_model_from_path
+from eflux.utils import (
+    convert_transcriptomics_to_enzyme_activity,
+    get_max_flux_bounds,
+    load_model_from_path,
+)
+
+HERE = Path(__file__).parent.resolve()
 
 
 def add_slack_variables_to_model(
@@ -193,20 +200,27 @@ def run_condition_specific_eflux(
 
 
 def eflux3(
-    model_path: str, data_path: str, *, reference_col: str, objective: Optional[str] = None
+    model_path_or_model: Union[str, cobra.Model],
+    data_path_or_data: Union[str, pd.DataFrame],
+    *,
+    reference_col: str,
+    objective: Optional[str] = None,
+    output_path: Optional[str] = None,
 ) -> pd.DataFrame:
     """Run the Eflux3 workflow.
 
     Parameters
     ----------
-        model_path : str
-            The path to the CobraPy compliant model for running eflux on.
+        model_path_or_model : Union[str, cobra.Model]
+            The path to the CobraPy compliant model or the model object for running eflux on.
         data_path : str
-            The path to the transcriptomics data to condition the fluxes on.
+            The path to the transcriptomics data or the data frame to condition the fluxes on.
         reference_col: str
             The column name of the reference column.
         objective : Optional[str]
             The desired objective reaction to use (default is None)
+        output_path: Optional[str]
+            The path to where you'd like the results saved as a tsv. (default is None)
 
     Returns
     -------
@@ -214,38 +228,52 @@ def eflux3(
             Condition specific fluxes from data for given cobra model.
 
     """
-    enzyme_activity = pd.read_csv(data_path, index_col="Reaction_ID")
+    if isinstance(data_path_or_data, str):
+        transcriptomics = pd.read_csv(data_path_or_data)
+    else:
+        transcriptomics = data_path_or_data
 
-    model = load_model_from_path(model_path)
+    if isinstance(model_path_or_model, str):
+        model = load_model_from_path(model_path_or_model)
+    else:
+        model = model_path_or_model
+
+    # FIXME: We hard coded these bounds for our specific case, how to genrealize?
     # model.reactions.BIOMASS__1.lower_bound = 0.01
     # model.reactions.EX_sucr_e.lower_bound = 0.0
 
     if objective is not None:
         model.objective = objective
 
+    enzyme_activity = convert_transcriptomics_to_enzyme_activity(transcriptomics, model)
+
+    # TODO: Clarify the use of the rxn_list here...
     fva_upper_bounds: dict[str, float] = get_max_flux_bounds(
         model,
         rxn_list=[],
     )  # ['EX_sucr_e', 'EX_photon650_e', 'EX_photon690_e', 'EX_co2_e', 'BIOMASS__1'])
 
+    # TODO: Return this (and save) as well
     condition_specific_upper_bounds = {
         condition: get_condition_specific_upper_bounds(
             fva_upper_bounds, enzyme_activity[condition].dropna().to_dict()
         )
         for condition in enzyme_activity
     }
+
     condition_specific_models = {
         condition: add_slack_variables_to_model(model, upper_bounds)
         for condition, upper_bounds in condition_specific_upper_bounds.items()
     }
 
-    condition_specific_fluxes = pd.DataFrame({
-        condition: condition_specific_model.optimize().fluxes
-        for condition, condition_specific_model in condition_specific_models.items()
-    })
-
-    fluxes = condition_specific_fluxes
-    # fluxes.to_csv('../data/circadian_experiments/processed_data/enzyme_constrained_fluxes.csv')
-    fluxes.to_csv(
-        "../data/circadian_experiments/processed_data/enzyme_constrained_fluxes_nocofactorsinmodel.csv"
+    condition_specific_fluxes = pd.DataFrame(
+        {
+            condition: condition_specific_model.optimize().fluxes
+            for condition, condition_specific_model in condition_specific_models.items()
+        }
     )
+
+    if output_path:
+        condition_specific_fluxes.to_csv(output_path, sep="\t")
+
+    return condition_specific_fluxes
