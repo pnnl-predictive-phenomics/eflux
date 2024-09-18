@@ -64,6 +64,9 @@ You can also use plain \LaTeX for equations
 and refer to \autoref{eq:fourier} from text.
 
 # Citations
+- `@eflux1`
+- `@eflux1_usage`
+- `@eflux2`
 
 <!-- Citations to entries in paper.bib should be in
 [rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
