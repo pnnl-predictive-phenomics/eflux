@@ -38,7 +38,8 @@ bibliography: paper.bib
 
 # Summary
 
-Here's a citation to the first E-flux paper \cite{@eflux1}.
+Here's a citation to the first publication for [E-flux](https://doi.org/10.1371/journal.pcbi.1000489) [@eflux1].
+
 blah blah blah
 
 # Statement of need
