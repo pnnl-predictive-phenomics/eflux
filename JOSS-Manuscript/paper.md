@@ -38,7 +38,7 @@ bibliography: paper.bib
 
 # Summary
 
-Here's a citation to the first E-flux paper  `@eflux1`.
+Here's a citation to the first E-flux paper  \cite{`@eflux1`}.
 blah blah blah
 
 # Statement of need
@@ -65,9 +65,8 @@ You can also use plain \LaTeX for equations
 and refer to \autoref{eq:fourier} from text.
 
 # Citations
-- `@eflux1`
-- `@eflux1_usage`
-- `@eflux2`
+
+ 
 
 <!-- Citations to entries in paper.bib should be in
 [rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
