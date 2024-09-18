@@ -38,6 +38,7 @@ bibliography: paper.bib
 
 # Summary
 
+Here's a citation to the first E-flux paper  `@eflux1`.
 blah blah blah
 
 # Statement of need
