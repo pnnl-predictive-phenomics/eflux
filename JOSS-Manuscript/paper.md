@@ -38,7 +38,7 @@ bibliography: paper.bib
 
 # Summary
 
-Here's a citation to the first E-flux paper  \cite{`@eflux1`}.
+Here's a citation to the first E-flux paper \cite{@eflux1}.
 blah blah blah
 
 # Statement of need
