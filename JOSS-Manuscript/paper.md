@@ -107,7 +107,7 @@ and refer to \autoref{eq:fourier} from text. -->
 
 # Acknowledgments
 - Contributors: Thank those who contributed to the development of the package.
-- Funding: This research was supported by Predictive Phenomics Initiative from 2022-2024, under the Laboratory Directed Research and Development (LDRD) Program at Pacific Northwest National Laboratory (PNNL).  PNNL is a multi-program national laboratory operated for the U.S. Department of Energy (DOE) by Battelle Memorial Institute under Contract No. DE-AC05-76RL01830.  Funding after October 1, 2024 was supported by  the DOE Biosystems Design Program under award number DE-SC0023091.
+- Funding: This research was supported by Predictive Phenomics Initiative from October 1, 2022-September 30, 2024, under the Laboratory Directed Research and Development (LDRD) Program at Pacific Northwest National Laboratory (PNNL).  PNNL is a multi-program national laboratory operated for the U.S. Department of Energy (DOE) by Battelle Memorial Institute under Contract No. DE-AC05-76RL01830.  Funding after October 1, 2024 was supported by  the DOE Biosystems Design Program under award number DE-SC0023091.
 
 
 
