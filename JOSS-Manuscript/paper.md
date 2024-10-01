@@ -107,7 +107,8 @@ and refer to \autoref{eq:fourier} from text. -->
 
 # Acknowledgments
 - Contributors: Thank those who contributed to the development of the package.
-- Funding: Mention any funding sources or grants that supported the work.
+- Funding: This research was supported by Predictive Phenomics Initiative from 2022-2024, under the Laboratory Directed Research and Development (LDRD) Program at Pacific Northwest National Laboratory (PNNL).  PNNL is a multi-program national laboratory operated for the U.S. Department of Energy (DOE) by Battelle Memorial Institute under Contract No. DE-AC05-76RL01830.  Funding after October 1, 2024 was supported by  the DOE Biosystems Design Program under award number DE-SC0023091.
+
 
 
 # Citations
@@ -135,9 +136,4 @@ and referenced from text using \autoref{fig:example}.
 Figure sizes can be customized by adding an optional second parameter:
 ![Caption for example figure.](figure.png){ width=20% }
 
-# Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
-
-# References
