@@ -46,7 +46,16 @@ Eflux1 quote: "Our method, which we call E-Flux (as a combination of flux and ex
 
 # Introduction 
 
-blah blah blah
+Flux Balance Analysis (FBA) is a widely used computational method in systems biology for predicting the flow of metabolites through metabolic networks based solely on stoichiometric constraints. Despite its utility, traditional FBA does not account for dynamic regulatory factors such as enzyme expression levels, which play a crucial role in modulating metabolic fluxes. This limitation can lead to less accurate predictions of metabolic behaviors under varying genetic and environmental conditions.
+
+The **E-flux** software addresses this limitation by integrating enzyme expression data directly into FBA to enhance the accuracy of predicted metabolic fluxes. The core idea of E-flux is simple: enzyme concentrations constrain the maximum allowable fluxes through metabolic pathways, and changes in enzyme levels are linearly correlated with changes in these maximum fluxes. However, the implementation of this concept requires sophisticated techniques to translate relative enzyme expression measurements into absolute flux constraints.
+
+To address this, we have developed three variants of the E-flux software, each designed to handle different computational and biological challenges:
+
+**E-flux 1:** Utilizes an L1 norm to minimize the sum of the fluxes, promoting sparsity in the flux distribution.
+**E-flux 2:** Employs an L2 norm to minimize the sum of the fluxes, promoting a more evenly distributed flux across pathways.
+**E-flux 3:** Introduces slack variables to ensure flux constraints do not cause infeasibilities, thus providing a more robust solution when dealing with inconsistent or noisy enzyme data.
+
 
 
 # Statement of need
