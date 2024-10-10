@@ -51,10 +51,9 @@ blah blah blah
 
 # Statement of need
 
-Previous implementations of the Eflux algorithm aimed to extending flux balance analysis (FBA) to model metabolic fluxes conditioned on gene expression [@eflux1], [@eflux2]. This allowed for predicting fluxes based on data for different experimental conditions and gene expression profiles [@eflux1_usage]. However, some conditions can strain the model optimization process used to calculate fluxes, leading to infeasible solutions. To this end, we introduce Eflux3, a new version of the algorithm that incorporates slack variables to ease the constraints in the optimization process and thus improve outcomes by allowing for a set of agreeable flux values.
+Previous implementations of the Eflux algorithm aimed to extending flux balance analysis (FBA) to model metabolic fluxes conditioned on gene expression [@eflux1], [@eflux2]. This allowed for predicting fluxes based on data for different experimental conditions and gene expression profiles [@eflux1_usage]. However, some conditions can strain the model optimization process used to calculate fluxes, leading to infeasible solutions. To this end, we developed Eflux3, a new version of the algorithm that incorporates slack variables to ease the constraints in the optimization process and thus improve outcomes by allowing for a set of agreeable flux values.
 
-Eflux is a Python package that allows for the calculation of fluxes conditioned on gene expression data [@eflux3_usage].
-
+Here we introduce Eflux as a Python package that allows for the calculation of fluxes conditioned on gene expression data. The package is meant to house the latest implementation of Eflux (Eflux3), as well as legacy implementations for completness and to allow for reproducing results.
 
 
 # Software Description
