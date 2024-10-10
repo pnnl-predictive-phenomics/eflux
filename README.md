@@ -26,7 +26,8 @@ subgraph Legend[<h1> Legend </h1>]
  subgraph Eflux[<h1> Eflux3 </h1>]
         direction TB
         B[" "]:::hidden
-        TranscData["Normalized Measured Transcriptomics"]
+        ExprData["Normalized Measured Expression Data 
+            (Transcriptomics or Proteomics)"]
         Convert(("Convert"))
         EnzAct["Enzyme 
         Activity"]
@@ -54,7 +55,7 @@ subgraph Legend[<h1> Legend </h1>]
     CompData ~~~ Action
 
     %% Get Enzyme Activity
-    TranscData --> Convert --> EnzAct
+    ExprData --> Convert --> EnzAct
 
     %% Get Max Flux Bounds
     OrigCobra --> FVA --> FluxBounds
@@ -71,7 +72,7 @@ subgraph Legend[<h1> Legend </h1>]
     %% Color styles for each node
     %% Raw Data - Blue
     style UserData stroke:#2962FF,fill:#2962FF,color:#FFFFFF
-    style TranscData stroke:#2962FF,fill:#2962FF,color:#FFFFFF
+    style ExprData stroke:#2962FF,fill:#2962FF,color:#FFFFFF
     style OrigCobra stroke:#2962FF,fill:#2962FF,color:#FFFFFF
 
     %% Computed Data- Green
