@@ -60,11 +60,10 @@ To address this, we have developed three variants of the E-flux software, each d
 
 # Statement of need
 
-Previous implementations of the Eflux algorithm aimed to extending flux balance analysis (FBA) to model metabolic fluxes conditioned on gene expression [@eflux1], [@eflux2]. This allowed for predicting fluxes based on data for different experimental conditions and gene expression profiles [@eflux1_usage]. However, some conditions can strain the model optimization process used to calculate fluxes, leading to infeasible solutions. To this end, we developed Eflux3, a new version of the algorithm that incorporates slack variables to ease the constraints in the optimization process and thus improve outcomes by allowing for a set of agreeable flux values.
-
-Here we introduce Eflux as a Python package that allows for the calculation of fluxes conditioned on gene expression data. The package is meant to house the latest implementation of Eflux (Eflux3), as well as legacy implementations for completness and to allow for reproducing results.
-
-
+Accurate prediction of metabolic fluxes is vital for various applications in biotechnology, including metabolic engineering, drug development, and understanding disease mechanisms. Traditional FBA methods, while useful, fall short by not incorporating dynamic biological data such as enzyme expression levels, thereby limiting their predictive accuracy and applicability.
+Previous implementations of the E-flux algorithm extended FBA to model metabolic fluxes conditioned on gene expression [@eflux1], [@eflux2]. This extension allowed for the prediction of fluxes based on data from different experimental conditions and gene expression profiles [@eflux1_usage]. However, certain conditions can strain the model optimization process used to calculate fluxes, leading to infeasible solutions. To address this, we developed E-flux3, a new version of the algorithm that incorporates slack variables to ease the constraints in the optimization process, thereby improving outcomes by allowing for a set of agreeable flux values.
+Here, we introduce E-flux as a Python package that enables the calculation of fluxes conditioned on gene expression data. The package includes the latest implementation (E-flux3) as well as legacy implementations to ensure completeness and reproducibility of results. By offering three distinct variants, E-flux caters to different research scenarios and data types, enhancing its utility across multiple fields. Researchers require tools that can predict metabolic fluxes with higher accuracy while offering flexibility and robustness in the face of varied and complex biological datasets.
+In summary, the E-flux software represents a significant advancement in the field of metabolic flux analysis. It bridges the gap between static stoichiometric models and dynamic biological regulation, offering researchers a versatile tool for more precise elucidation and manipulation of metabolic pathways. This innovation is crucial for advancing our understanding of biological systems and improving the predictability of biotechnological applications.
 # Software Description
 
 ## Overview
