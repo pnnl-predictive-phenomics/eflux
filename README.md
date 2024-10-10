@@ -12,74 +12,82 @@ A repository for hosting the code for E-flux.
 
 ```mermaid
 flowchart TD
- subgraph Legend[<h2> Legend </h2>]
- direction LR
-        UserData["User Provided Data"]
-        CompData["Computed Data"]
-        Action(("Action/Process"))
-  end
 
- subgraph ObservedData[<h2> Observed Data and Pre-processing </h2>]
-        Data["Observed Data"]
-        TranscData["Transcriptomics"]
-        ExMetab["External Metabolites"]
-        RxnConstr["Reactions of Interest & Objectives"]
-        CalcExFlux["Calculated External Fluxes"]
-        EnzAct["Enzyme Activity"]
-  end
+classDef hidden display: none;
 
- subgraph CobraModel[<h2> Cobra Model and Pre-processing </h2>]
+subgraph Legend[<h1> Legend </h1>]
+ %% subgraph Legend["**Legend**"]
+        A[" "]:::hidden
+        UserData["User-Provided"]
+        CompData["Computed"]
+        Action(("Process"))
+ end
+
+ subgraph Eflux[<h1> Eflux3 </h1>]
+        direction TB
+        B[" "]:::hidden
+        TranscData["Normalized Measured Transcriptomics"]
+        Convert(("Convert"))
+        EnzAct["Enzyme 
+        Activity"]
         FVA(("FVA"))
         OrigCobra["Cobra Model"]
-        FluxBounds["Flux Bounds"]
-        RefCobra["Data-Conditional Cobra Model"]
-        DelZeroFlux(("Delete 0-Flux Reactions"))
-  end
+        FluxBounds["Max 
+        Flux Bounds"]
+        CondBounds["Condition Specific 
+        Upper Bounds"]
+        AddSlack(("Add Slack 
+        Variables"))
+        CondModel["Condition
+         Specific Model"]
+        Optimize(("Optimize"))
+        CondCompFluxes["Conditionally 
+        Computed Fluxes"]
+ end
 
-  subgraph E-flux[<h2> E-flux Algorithm </h2>]
-        Eflux(("Eflux3"))
-        CondCompFluxes["Conditional Computed Fluxes"]
-  end
+    %% Hidden links to create spacing
+    A ~~~ UserData
+    B ~~~ OrigCobra
 
-    %% Data Links
-    Data --> TranscData & ExMetab & RxnConstr 
-    ExMetab --> CalcExFlux
-    TranscData -- Convert --> EnzAct
+    %% Legend Links (to enforce TD)
+    UserData ~~~ CompData
+    CompData ~~~ Action
 
-    %% Cobra Model Links
-    OrigCobra --> FVA 
-    FVA --> FluxBounds
-    FluxBounds --> RefCobra
-    RefCobra --> DelZeroFlux & Eflux 
-    DelZeroFlux --> RefCobra
-    Eflux --> CondCompFluxes
+    %% Get Enzyme Activity
+    TranscData --> Convert --> EnzAct
 
-    %% Inter-subgraph Links
-    RxnConstr --> FVA
-    CalcExFlux & EnzAct --> Eflux
+    %% Get Max Flux Bounds
+    OrigCobra --> FVA --> FluxBounds
+
+    %% Get Conditioned Upper Bounds
+    FluxBounds & EnzAct --> CondBounds
+
+    %% Get Conditioned Model
+    OrigCobra & CondBounds --> AddSlack --> CondModel
+
+    %% Get Conditioned Fluxes
+    CondModel --> Optimize --> CondCompFluxes
 
     %% Color styles for each node
     %% Raw Data - Blue
     style UserData stroke:#2962FF,fill:#2962FF,color:#FFFFFF
     style TranscData stroke:#2962FF,fill:#2962FF,color:#FFFFFF
-    style ExMetab stroke:#2962FF,fill:#2962FF,color:#FFFFFF
-    style RxnConstr stroke:#2962FF,fill:#2962FF,color:#FFFFFF
-    style Data stroke:#2962FF,fill:#2962FF,color:#FFFFFF
     style OrigCobra stroke:#2962FF,fill:#2962FF,color:#FFFFFF
 
     %% Computed Data- Green
     style CompData fill:#00C853,color:#000000
-    style CalcExFlux fill:#00C853,color:#000000
     style EnzAct fill:#00C853,color:#000000
-    style FVA stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,fill:#FFD600,color:#000000
     style FluxBounds fill:#00C853,color:#000000
-    style RefCobra fill:#00C853,color:#000000
+    style CondBounds fill:#00C853,color:#000000
+    style CondModel fill:#00C853,color:#000000
     style CondCompFluxes fill:#00C853,color:#000000
 
-    %% Action/Process - Yellow
+    %% Process - Yellow
     style Action stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,fill:#FFD600,color:#000000
-    style DelZeroFlux stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,fill:#FFD600,color:#000000
-    style Eflux fill:#FFD600,stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,color:#000000
+    style Convert stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,fill:#FFD600,color:#000000
+    style FVA stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,fill:#FFD600,color:#000000
+    style AddSlack fill:#FFD600,stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,color:#000000
+    style Optimize fill:#FFD600,stroke:#FFD600,stroke-width:4px,stroke-dasharray: 0,color:#000000
 ```
 
 ## Getting Started 🏃

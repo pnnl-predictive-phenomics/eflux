@@ -15,18 +15,18 @@ authors:
     orcid: 0000-0002-4146-7921
     equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
     affiliation: 1
-  - name: Jeremy Zucker
+  - name: Jeremy D. Zucker
     orcid: 0000-0002-7276-9009
     equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
-    affiliation: 2
+    affiliation: 1
 affiliations:
  - name: Pacific Northwest National Laboratory
    index: 1
    ror: 
- - name: Institution Name, Country
-   index: 2
- - name: Independent Researcher, Country
-   index: 3
+#  - name: Institution Name, Country
+#    index: 2
+#  - name: Independent Researcher, Country
+#    index: 3
 date: 30 September 2024
 bibliography: paper.bib
 
@@ -48,11 +48,13 @@ Eflux1 quote: "Our method, which we call E-Flux (as a combination of flux and ex
 
 blah blah blah
 
+
 # Statement of need
 
-blah blah blah
+Previous implementations of the Eflux algorithm aimed to extending flux balance analysis (FBA) to model metabolic fluxes conditioned on gene expression [@eflux1], [@eflux2]. This allowed for predicting fluxes based on data for different experimental conditions and gene expression profiles [@eflux1_usage]. However, some conditions can strain the model optimization process used to calculate fluxes, leading to infeasible solutions. To this end, we introduce Eflux3, a new version of the algorithm that incorporates slack variables to ease the constraints in the optimization process and thus improve outcomes by allowing for a set of agreeable flux values.
 
-blah blah blah
+Eflux is a Python package that allows for the calculation of fluxes conditioned on gene expression data [@eflux3_usage].
+
 
 
 # Software Description
@@ -111,7 +113,7 @@ and refer to \autoref{eq:fourier} from text. -->
 
 
 
-# Citations
+# References
 
  
 
